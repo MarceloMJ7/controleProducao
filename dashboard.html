@@ -7,56 +7,23 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
-    <style>
-      body {
-        background: linear-gradient(135deg, #212529, #495057);
-        background-attachment: fixed;
-        min-height: 100vh;
-      }
-      .sidebar { width: 250px; background-color: #212529 !important; }
-      .main-content { flex-grow: 1; height: 100vh; overflow-y: auto; }
-      .nav-pills .nav-link { color: rgba(255, 255, 255, 0.75); }
-      .nav-pills .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: #fff; }
-      .nav-pills .nav-link.active { background-color: #0d6efd; color: #fff; }
-      .glass-card {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border-radius: 0.75rem;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      }
-      .list-group-glass .list-group-item {
-        background-color: transparent;
-        border-color: rgba(255, 255, 255, 0.15);
-        color: #f8f9fa;
-      }
-      .table-glass { color: #f8f9fa; }
-      .table-glass th, .table-glass td {
-        border-color: f8f9fa;
-        color: #f8f9fa;
-        background-color: transparent; 
-      }
-
-     
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <main class="d-flex flex-nowrap">
         <div class="sidebar d-flex flex-column flex-shrink-0 p-3 text-bg-dark">
-            <a href="dashboard_glass.html" class="d-flex align-items-center mb-3 text-white text-decoration-none"><i class="fas fa-cogs fa-2x me-2"></i><span class="fs-4 fw-bold">SGP</span></a><hr>
+            <a href="dashboard.html" class="d-flex align-items-center mb-3 text-white text-decoration-none"><i class="fas fa-cogs fa-2x me-2"></i><span class="fs-4 fw-bold">SGP</span></a><hr>
             <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item"><a href="dash.html" class="nav-link active"><i class="fas fa-tachometer-alt fa-fw me-2"></i> Painel de Controle</a></li>
-                <li><a href="#" class="nav-link"><i class="fas fa-project-diagram fa-fw me-2"></i> Projetos</a></li>
-                <li><a href="#" class="nav-link"><i class="fas fa-users-cog fa-fw me-2"></i> Montadores</a></li>
-                <li><a href="#" class="nav-link"><i class="fas fa-chart-pie fa-fw me-2"></i> Relatórios</a></li>
+                <li class="nav-item"><a href="dashboard.html" class="nav-link active" aria-current="page"><i class="fas fa-tachometer-alt fa-fw me-2"></i> Painel de Controle</a></li>
+                <li><a href="projetos.html" class="nav-link"><i class="fas fa-project-diagram fa-fw me-2"></i> Projetos</a></li>
+                <li><a href="montadores.html" class="nav-link"><i class="fas fa-users-cog fa-fw me-2"></i> Montadores</a></li>
+                <li><a href="relatorios.html" class="nav-link"><i class="fas fa-chart-pie fa-fw me-2"></i> Relatórios</a></li>
             </ul><hr>
-            <div class="dropdown"><a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong>Usuário</strong></a><ul class="dropdown-menu dropdown-menu-dark text-small shadow"><li><a class="dropdown-item" href="index.html">Sair</a></li></ul></div>
+            <div class="dropdown"><a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong>Usuário</strong></a><ul class="dropdown-menu dropdown-menu-dark text-small shadow"><li><a class="dropdown-item" href="login.html">Sair</a></li></ul></div>
         </div>
         
         <div class="main-content p-4">
-            
             <h1 class="h2 mb-4 text-white">Painel de Controle</h1>
 
             <div class="row g-4">
@@ -66,51 +33,19 @@
             </div>
 
             <div class="row g-4 mt-3">
-                <div class="col-lg-7"><div class="card glass-card h-100"><div class="card-body"><h5 class="card-title text-white mb-3"><i class="fas fa-chart-bar me-2"></i> Carga de Trabalho</h5><ul class="list-group list-group-flush list-group-glass"><li class="list-group-item d-flex justify-content-between align-items-center">Carlos Silva <span class="badge text-bg-primary rounded-pill">3 projetos</span></li><li class="list-group-item d-flex justify-content-between align-items-center">João Pereira <span class="badge text-bg-primary rounded-pill">2 projetos</span></li><li class="list-group-item d-flex justify-content-between align-items-center">Marcos Andrade <span class="badge text-bg-secondary rounded-pill">0 projetos</span></li></ul></div></div></div>
-                <div class="col-lg-5"><div class="card glass-card h-100"><div class="card-body"><h5 class="card-title text-white mb-3"><i class="fas fa-history me-2"></i> Últimas Atualizações</h5><ul class="list-group list-group-flush list-group-glass"><li class="list-group-item"><span class="badge text-bg-success">Concluído</span> Projeto ABC-123</li><li class="list-group-item"><span class="badge text-bg-info">Atribuído</span> Projeto XYZ-456</li><li class="list-group-item"><span class="badge text-bg-warning">Pausado</span> Projeto TST-789</li></ul></div></div></div>
+                <div class="col-lg-7"><div class="card glass-card h-100"><div class="card-body"><h5 class="card-title text-white mb-3"><i class="fas fa-chart-bar me-2"></i> Carga de Trabalho</h5>
+                <ul class="list-group list-group-flush"><li class="list-group-item d-flex justify-content-between align-items-center">Carlos Silva <span class="badge text-bg-primary rounded-pill">3 projetos</span></li><li class="list-group-item d-flex justify-content-between align-items-center">João Pereira <span class="badge text-bg-primary rounded-pill">2 projetos</span></li><li class="list-group-item d-flex justify-content-between align-items-center">Marcos Andrade <span class="badge text-bg-secondary rounded-pill">0 projetos</span></li></ul></div></div></div>
+                <div class="col-lg-5"><div class="card glass-card h-100"><div class="card-body"><h5 class="card-title text-white mb-3"><i class="fas fa-history me-2"></i> Últimas Atualizações</h5>
+                <ul class="list-group list-group-flush"><li class="list-group-item"><span class="badge text-bg-success">Concluído</span> Projeto ABC-123</li><li class="list-group-item"><span class="badge text-bg-info">Atribuído</span> Projeto XYZ-456</li><li class="list-group-item"><span class="badge text-bg-warning">Pausado</span> Projeto TST-789</li></ul></div></div></div>
             </div>
             
             <div class="row g-4 mt-3">
-                <div class="col-12">
-                    <div class="card glass-card">
-                        <div class="card-body">
-                            <h5 class="card-title text-white mb-3"><i class="fas fa-calendar-alt me-2"></i>Prazos de Entrega Próximos</h5>
-                            <div class="table-responsive">
-                                <table class="table table-glass">
-                                    <thead>
-                                        <tr>
-                                            <th>Projeto</th>
-                                            <th>Cliente</th>
-                                            <th class="text-end">Vencimento</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>PRJ-105</td>
-                                            <td>Empresa X</td>
-                                            <td class="text-end"><span class="badge rounded-pill border border-danger text-danger">Vence Hoje</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>PRJ-098</td>
-                                            <td>Empresa Y</td>
-                                            <td class="text-end"><span class="badge rounded-pill border border-warning text-warning">Em 2 dias</span></td>
-                                        </tr>
-                                         <tr>
-                                            <td>PRJ-112</td>
-                                            <td>Empresa Z</td>
-                                            <td class="text-end"><span class="badge rounded-pill border border-info text-info">Em 1 semana</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div class="col-12"><div class="card glass-card"><div class="card-body"><h5 class="card-title text-white mb-3"><i class="fas fa-calendar-alt me-2"></i>Prazos de Entrega Próximos</h5><div class="table-responsive"><table class="table table-glass"><thead><tr><th>Projeto</th><th>Cliente</th><th class="text-end">Vencimento</th></tr></thead><tbody><tr><td>PRJ-105</td><td>Empresa X</td><td class="text-end"><span class="badge rounded-pill border border-danger text-danger">Vence Hoje</span></td></tr><tr><td>PRJ-098</td><td>Empresa Y</td><td class="text-end"><span class="badge rounded-pill border border-warning text-warning">Em 2 dias</span></td></tr><tr><td>PRJ-112</td><td>Empresa Z</td><td class="text-end"><span class="badge rounded-pill border border-info text-info">Em 1 semana</span></td></tr></tbody></table></div></div></div></div>
             </div>
-            </div>
+        </div>
     </main>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="scripts.js"></script>
 </body>
 </html>

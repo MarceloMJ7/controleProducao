@@ -1,0 +1,111 @@
+/* ============================================= */
+/* ESTILOS GERAIS E TEMA "GLASSMORPHISM"         */
+/* ============================================= */
+
+body {
+    background: linear-gradient(135deg, #212529, #495057);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  
+  /* --- Layout da Sidebar --- */
+  .sidebar {
+    width: 280px;
+    background-color: #212529 !important;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  
+  /* --- Estilos da Navegação na Sidebar --- */
+  .nav-pills .nav-link {
+    color: rgba(255, 255, 255, 0.75);
+  }
+  
+  .nav-pills .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+  
+  .nav-pills .nav-link.active {
+    background-color: #0d6efd; /* Azul Padrão Bootstrap */
+    color: #fff;
+  }
+  
+  /* --- Componente Principal: Cartão de Vidro --- */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* ============================================= */
+  /* CORREÇÃO PARA LISTAS E TABELAS                */
+  /* ============================================= */
+  
+  /* Regra mais específica para itens de lista dentro de um card de vidro */
+  .glass-card .list-group-item {
+      background-color: transparent !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+      color: #f8f9fa;
+  }
+  
+  .table-glass {
+    color: #f8f9fa;
+  }
+  
+  .table-glass th, .table-glass td {
+    color: #f8f9fa;
+    border-color: rgba(255, 255, 255, 0.15);
+    background-color: transparent !important; 
+  }
+  
+  .table-glass tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    cursor: pointer;
+  }
+  
+  /* --- Estilos para Formulários no Tema de Vidro --- */
+  .form-control-glass, .form-select-glass {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
+  }
+  
+  .form-control-glass::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  .input-group-text-glass {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+  
+  .form-select-glass {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  }
+  
+  /* --- Estilos para o Modal de Vidro --- */
+  .modal-glass {
+    background: rgba(33, 37, 41, 0.6);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+  
+  .modal-glass .modal-content {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .modal-glass .modal-header, .modal-glass .modal-footer {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
