@@ -1,32 +1,63 @@
 /* ============================================= */
+/* SCRIPT PARA A PÁGINA DE PROJETOS              */
+/* ============================================= */
+const tabelaProjetos = document.getElementById('projetosTabela');
+// Garante que o código só rode na página de projetos
+if (tabelaProjetos) {
+    // Pega os elementos do card de detalhes
+    const detailsCard = document.getElementById('projectDetailsCard');
+    const projectCodeDetail = document.getElementById('projectCodeDetail');
+    const projectCompanyDetail = document.getElementById('projectCompanyDetail');
+    const projectDescriptionDetail = document.getElementById('projectDescriptionDetail');
+    const projectAssemblerDetail = document.getElementById('projectAssemblerDetail');
+    const projectStatusDetail = document.getElementById('projectStatusDetail');
+
+    // Adiciona um evento de clique para cada linha da tabela
+    tabelaProjetos.querySelectorAll('tr').forEach(item => {
+        item.addEventListener('click', event => {
+            // Extrai as informações da linha clicada
+            const codigo = item.cells[0].textContent;
+            const empresa = item.cells[1].textContent;
+            const statusBadge = item.cells[4].innerHTML; // Pega o HTML do badge de status
+            
+            // Extrai as informações dos atributos data-*
+            const montador = item.dataset.montador;
+            const descricao = item.dataset.description;
+
+            // Preenche o card de detalhes com as informações
+            projectCodeDetail.innerText = `Detalhes do Projeto: ${codigo}`;
+            projectCompanyDetail.innerText = empresa;
+            projectDescriptionDetail.innerText = descricao;
+            projectAssemblerDetail.innerText = montador;
+            projectStatusDetail.innerHTML = statusBadge;
+
+            // Mostra o card de detalhes
+            detailsCard.classList.remove('d-none');
+        });
+    });
+}
+
+
+/* ============================================= */
 /* SCRIPT PARA A PÁGINA DE MONITORES             */
 /* ============================================= */
 
 const tabelaMontadores = document.getElementById('montadoresTabela');
-// A verificação 'if' garante que este código só rodará se o elemento 'tabelaMontadores' existir na página.
 if (tabelaMontadores) {
     const performanceCard = document.getElementById('performanceDetailsCard');
     const performancePlaceholder = document.getElementById('performancePlaceholder');
     const performanceData = document.getElementById('performanceData');
     const nomeMontadorDetalhe = document.getElementById('montadorNomeDetalhe');
     const chartCanvas = document.getElementById('montadorPerformanceChart');
-    let montadorChart; // Variável para guardar a instância do nosso gráfico
+    let montadorChart; 
 
     tabelaMontadores.querySelectorAll('tr').forEach(item => {
         item.addEventListener('click', event => {
-            const nome = item.cells[1].textContent; // Pega o nome da segunda célula
-
-            // Esconde o placeholder e mostra a área de dados
+            const nome = item.cells[1].textContent;
             if(performancePlaceholder) performancePlaceholder.classList.add('d-none');
             if(performanceData) performanceData.classList.remove('d-none');
-            
             nomeMontadorDetalhe.textContent = `Desempenho de ${nome}`;
-
-            // Se um gráfico já existir, destrua-o antes de criar um novo
-            if (montadorChart) {
-                montadorChart.destroy();
-            }
-            
+            if (montadorChart) { montadorChart.destroy(); }
             montadorChart = new Chart(chartCanvas, {
                 type: 'bar',
                 data: {
@@ -55,7 +86,6 @@ if (tabelaMontadores) {
 /* ============================================= */
 
 const reportForm = document.getElementById('reportForm');
-// A verificação 'if' garante que este código só rodará se o elemento 'reportForm' existir na página.
 if (reportForm) {
     const reportTypeSelect = document.getElementById('reportType');
     const montadorFilter = document.getElementById('montadorFilter');
@@ -66,7 +96,6 @@ if (reportForm) {
     const reportTableHeader = document.getElementById('reportTableHeader');
     const reportTableBody = document.getElementById('reportTableBody');
 
-    // Lógica para filtros dinâmicos
     if(reportTypeSelect) {
         reportTypeSelect.addEventListener('change', function() {
             if (this.value === 'montador') {
@@ -79,18 +108,14 @@ if (reportForm) {
         });
     }
 
-    // Lógica para gerar o relatório
     reportForm.addEventListener('submit', function(event) {
         event.preventDefault();
         reportPlaceholder.classList.add('d-none');
         reportResults.classList.remove('d-none');
-        
         reportTableHeader.innerHTML = '';
         reportTableBody.innerHTML = '';
-
         const selectedReport = reportTypeSelect.value;
         reportTitle.textContent = `Relatório: ${reportTypeSelect.options[reportTypeSelect.selectedIndex].text}`;
-
         if (selectedReport === 'montador') {
             reportTableHeader.innerHTML = `<tr><th>Montador</th><th class="text-center">Projetos Concluídos</th><th class="text-center">Média de Tempo / Projeto</th></tr>`;
             reportTableBody.innerHTML = `<tr><td>Carlos Silva</td><td class="text-center">8</td><td class="text-center">3 dias</td></tr><tr><td>João Pereira</td><td class="text-center">4</td><td class="text-center">5 dias</td></tr>`;
