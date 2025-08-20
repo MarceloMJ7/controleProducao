@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const projectRoutes = require('./routes/projectRoutes');
+const montadorRoutes = require('./routes/montadorRoutes');
 
 //Iniciando ferramentas
 const app = express();
@@ -18,7 +19,8 @@ app.get('/', (req, res) => {
     res.send("Hello, World")
 })
 app.use('/api', userRoutes);
-app.use('/api', projectRoutes)
+app.use('/api', projectRoutes);
+app.use('/api', montadorRoutes);
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`)
 })
