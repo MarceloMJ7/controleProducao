@@ -61,7 +61,7 @@ router.post('/login', async (req, res) => {
         res.status(200).json({ token });
 
     } catch (error) {
-        res.status(500).json({ message: "Ocorreu um erro ao fazer login." });
+        res.status(500).json({ message: "Ocorreu um erro ao fazer login. Tente Novamente" });
     }
 });
 

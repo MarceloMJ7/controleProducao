@@ -1,6 +1,6 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-const verificarToken = require('../middleware/authMiddleware'); // <-- Importando nosso segurança
+const verificarToken = require('../middleware/authMiddleware'); 
 
 const router = express.Router();
 const prisma = new PrismaClient();
