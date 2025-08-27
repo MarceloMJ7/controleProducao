@@ -1,3 +1,156 @@
+// Função que executa assim que a página termina de carregar
+document.addEventListener('DOMContentLoaded', function() {
+    // Verifica se a página atual NÃO é a de login ou cadastro
+    if (window.location.pathname.endsWith('login.html') || window.location.pathname.endsWith('cadastro.html')) {
+        return; // Se for, não faz nada
+    }
+
+    // Se for qualquer outra página, tenta carregar os dados do usuário
+    carregarDadosUsuario();
+});
+
+async function carregarDadosUsuario() {
+    // 1. Pega o token do "bolso" do navegador (localStorage)
+    const token = localStorage.getItem('authToken');
+
+    // 2. Se não houver token, o usuário não está logado. Redireciona para o login.
+    if (!token) {
+        alert('Você não está logado. Por favor, faça o login.');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // 3. Se houver token, busca os dados do perfil na API
+    try {
+        const response = await fetch('http://localhost:3001/api/usuarios/perfil', {
+            method: 'GET',
+            headers: {
+                // Anexa o "crachá" (token) no cabeçalho da requisição
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const usuario = await response.json();
+            // 4. Pega o nome do usuário e coloca na sidebar
+            const elementoNome = document.getElementById('nomeUsuarioLogado');
+            if (elementoNome) {
+                elementoNome.textContent = usuario.nome;
+            }
+        } else {
+            // Se o token for inválido/expirado, o back-end dará erro.
+            // Limpamos o token inválido e redirecionamos para o login.
+            localStorage.removeItem('authToken');
+            window.location.href = 'login.html';
+        }
+    } catch (error) {
+        console.error('Erro ao buscar dados do usuário:', error);
+        alert('Sua sessão expirou. Por favor, faça login novamente.');
+        localStorage.removeItem('authToken');
+        window.location.href = 'login.html';
+    }
+}
+
+
+/* ============================================= */
+/* LÓGICA DA TELA DE CADASTRO                    */
+/* ============================================= */
+// Procuramos pelo formulário de cadastro na página
+const cadastroForm = document.getElementById('cadastroForm');
+
+// Se o formulário existir nesta página, adicionamos a lógica a ele
+if (cadastroForm) {
+  cadastroForm.addEventListener('submit', async function (event) {
+    // 1. Impede o comportamento padrão do formulário
+    event.preventDefault();
+
+    // 2. Pega os valores de TODOS os campos
+    const nome = document.getElementById('nome').value;
+    const numero_registro = document.getElementById('numero_registro').value;
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
+    const confirmarSenha = document.getElementById('confirmarSenha').value;
+
+    // 3. Validação no Front-End: Verifica se as senhas coincidem
+    if (senha !== confirmarSenha) {
+      alert('As senhas não coincidem!');
+      return; // Para a execução aqui se as senhas forem diferentes
+    }
+
+    // 4. Envia os dados para a API de back-end
+    try {
+      const response = await fetch('http://localhost:3001/api/usuarios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nome, numero_registro, email, senha }),
+      });
+
+      const data = await response.json();
+
+      if (response.status === 201) { // 201 = Created
+        // Se o usuário foi criado com sucesso
+        alert('Usuário criado com sucesso! Por favor, faça o login.');
+        window.location.href = 'login.html'; // Redireciona para a página de login
+      } else {
+        // Se deu erro (ex: e-mail já existe), mostra a mensagem do back-end
+        throw new Error(data.message || 'Erro ao cadastrar usuário.');
+      }
+    } catch (error) {
+      // 5. Se qualquer erro acontecer, mostra um alerta
+      alert(error.message);
+    }
+  });
+}
+
+/* ============================================= */
+/* LÓGICA DA TELA DE LOGIN                       */
+/* ============================================= */
+// Procuramos pelo formulário de login na página
+const loginForm = document.getElementById('loginForm');
+
+// Se o formulário existir nesta página, adicionamos a lógica a ele
+if (loginForm) {
+  loginForm.addEventListener('submit', async function (event) {
+    // 1. Impede o comportamento padrão do formulário (que é recarregar a página)
+    event.preventDefault();
+
+    // 2. Pega os valores digitados pelo usuário nos campos
+    const numero_registro = document.getElementById('numero_registro').value;
+    const senha = document.getElementById('senha').value;
+
+    try {
+      // 3. Envia os dados para a nossa API de back-end
+      const response = await fetch('http://localhost:3001/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ numero_registro, senha }),
+      });
+
+      // 4. Pega a resposta da API e a transforma em JSON
+      const data = await response.json();
+
+      // 5. Verifica se a resposta foi um sucesso (status 200 a 299)
+      if (response.ok) {
+        // Se deu certo, salvamos o token na memória do navegador
+        localStorage.setItem('authToken', data.token);
+    
+        window.location.href = 'dashboard.html'; // Redireciona para o dashboard
+      } else {
+        // Se deu erro, lança um erro com a mensagem que o back-end enviou
+        throw new Error(data.message || 'Erro ao fazer login.');
+      }
+    } catch (error) {
+      // 6. Se qualquer erro acontecer, mostra um alerta para o usuário
+      alert(error.message);
+    }
+  });
+}
+
+
 /* ============================================= */
 /* SCRIPT PARA A PÁGINA DE PROJETOS              */
 /* ============================================= */
