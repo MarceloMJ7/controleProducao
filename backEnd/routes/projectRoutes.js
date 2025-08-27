@@ -25,31 +25,24 @@ router.get('/projetos', verificarToken, async (req, res) => {
 });
 
 router.post('/projetos', verificarToken, async (req, res) => {
-    // Pega os dados enviados pelo front-end no corpo (body) da requisição
-    const { codigo_projeto, nome_empresa, status, descricao, data_entrega, montadorId } = req.body;
-
-    // Pega a ID do usuário que está logado (graças ao nosso middleware verificarToken)
-    // No futuro, poderíamos usar isso para registrar quem criou o projeto
-    const usuarioId = req.usuarioId;
+    // Garanta que 'data_cadastro' está sendo pego aqui
+    const { codigo_projeto, nome_empresa, status, descricao, data_cadastro, data_entrega, montadorId } = req.body;
 
     try {
-        // Usa o Prisma para criar um novo registro na tabela 'Projeto'
         const novoProjeto = await prisma.projeto.create({
             data: {
                 codigo_projeto,
                 nome_empresa,
                 status,
                 descricao,
-                data_entrega: new Date(data_entrega), // Converte o texto da data para o formato de data
-                montadorId, // Associa o projeto ao ID do montador
+                data_cadastro: new Date(data_cadastro), // Converte o texto para Data
+                data_entrega: data_entrega ? new Date(data_entrega) : null, // Converte se existir
+                montadorId: parseInt(montadorId), // Garante que o ID seja um número
             }
         });
-
-        // Envia de volta uma resposta de sucesso com os dados do projeto criado
         res.status(201).json(novoProjeto);
-
     } catch (error) {
-        console.error(error); // Mostra o erro detalhado no terminal do back-end
+        console.error(error);
         res.status(500).json({ message: "Erro ao criar projeto." });
     }
 });

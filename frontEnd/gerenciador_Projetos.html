@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,54 +8,42 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
     <main class="d-flex flex-nowrap">
         <div class="sidebar d-flex flex-column flex-shrink-0 p-3 text-bg-dark">
-            <a href="dashboard.html" class="d-flex align-items-center mb-3 text-white text-decoration-none"><i
-                    class="fas fa-cogs fa-2x me-2"></i><span class="fs-4 fw-bold">SGP</span></a>
-            <hr>
+            <a href="dashboard.html" class="d-flex align-items-center mb-3 text-white text-decoration-none"><i class="fas fa-cogs fa-2x me-2"></i><span class="fs-4 fw-bold">SGP</span></a><hr>
             <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i
-                            class="fas fa-tachometer-alt fa-fw me-2"></i> Painel de Controle</a></li>
-                <li><a href="gerenciador_Projetos.html" class="nav-link active" aria-current="page"><i
-                            class="fas fa-project-diagram fa-fw me-2"></i> Projetos</a></li>
-                <li><a href="gerenciador_Montadores.html" class="nav-link"><i class="fas fa-users-cog fa-fw me-2"></i>
-                        Montadores</a></li>
-                <li><a href="relatorios.html" class="nav-link"><i class="fas fa-chart-pie fa-fw me-2"></i>
-                        Relatórios</a></li>
-            </ul>
-            <hr>
-            <div class="dropdown"><a href="#"
-                    class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle"
-                    data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong id="nomeUsuarioLogado">Usuário</strong></a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                    <li><a class="dropdown-item" href="login.html">Sair</a></li>
-                </ul>
-            </div>
+                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt fa-fw me-2"></i> Painel de Controle</a></li>
+                <li><a href="gerenciador_Projetos.html" class="nav-link active" aria-current="page"><i class="fas fa-project-diagram fa-fw me-2"></i> Projetos</a></li>
+                <li><a href="gerenciador_Montadores.html" class="nav-link"><i class="fas fa-users-cog fa-fw me-2"></i> Montadores</a></li>
+                <li><a href="relatorios.html" class="nav-link"><i class="fas fa-chart-pie fa-fw me-2"></i> Relatórios</a></li>
+            </ul><hr>
+            <div class="dropdown"><a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong id="nomeUsuarioLogado">Usuário</strong></a><ul class="dropdown-menu dropdown-menu-dark text-small shadow"><li><a class="dropdown-item" href="login.html">Sair</a></li></ul></div>
         </div>
-
+        
         <div class="main-content p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h2 text-white">Gerenciar Projetos</h1>
-                <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal"
-                    data-bs-target="#addProjectModal"><i class="fas fa-plus me-2"></i> Adicionar Projeto</button>
+                <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#addProjectModal"><i class="fas fa-plus me-2"></i> Adicionar Projeto</button>
             </div>
             <div class="card glass-card">
                 <div class="card-header border-bottom border-secondary border-opacity-25">
                     <form class="row g-3 align-items-center">
                         <div class="col-md-8">
-                            <div class="input-group"><span class="input-group-text input-group-text-glass"><i
-                                        class="fas fa-search"></i></span><input type="text"
-                                    class="form-control form-control-glass" placeholder="Buscar..."></div>
+                            <div class="input-group">
+                                <span class="input-group-text input-group-text-glass"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control form-control-glass" placeholder="Buscar por código ou empresa...">
+                            </div>
                         </div>
-                        <div class="col-md-4"><select class="form-select form-select-glass">
+                        <div class="col-md-4">
+                            <select class="form-select form-select-glass">
                                 <option selected>Filtrar por Status...</option>
                                 <option>Pendente</option>
                                 <option>Em Montagem</option>
                                 <option>Concluído</option>
-                            </select></div>
+                            </select>
+                        </div>
                     </form>
                 </div>
                 <div class="card-body">
@@ -73,35 +60,7 @@
                                 </tr>
                             </thead>
                             <tbody id="projetosTabela">
-                                <tr data-montador="Carlos Silva"
-                                    data-description="Montagem completa de esquadrias para a fachada do novo prédio administrativo da Empresa X. Inclui 30 janelas e 4 portas de vidro.">
-                                    <td>PRJ-105</td>
-                                    <td>Empresa X</td>
-                                    <td>01/08/2025</td>
-                                    <td>15/08/2025</td>
-                                    <td class="text-center"><span
-                                            class="badge rounded-pill border border-success text-success">Concluído</span>
-                                    </td>
-                                    <td class="text-end"><a href="#" class="btn btn-sm btn-outline-light me-2"><i
-                                                class="fas fa-edit"></i></a><a href="#"
-                                            class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt"></i></a>
-                                    </td>
-                                </tr>
-                                <tr data-montador="João Pereira"
-                                    data-description="Fabricação e instalação de corrimão de aço inox para a escadaria principal da Empresa Y.">
-                                    <td>PRJ-098</td>
-                                    <td>Empresa Y</td>
-                                    <td>28/07/2025</td>
-                                    <td>10/08/2025</td>
-                                    <td class="text-center"><span
-                                            class="badge rounded-pill border border-primary text-primary">Em
-                                            Montagem</span></td>
-                                    <td class="text-end"><a href="#" class="btn btn-sm btn-outline-light me-2"><i
-                                                class="fas fa-edit"></i></a><a href="#"
-                                            class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt"></i></a>
-                                    </td>
-                                </tr>
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
@@ -137,45 +96,31 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content modal-glass">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5 text-white">Adicionar Novo Projeto</h1><button type="button"
-                        class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <h1 class="modal-title fs-5 text-white">Adicionar Novo Projeto</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <form>
+                <form id="addProjectForm">
+                    <div class="modal-body">
                         <div class="row g-3">
-                            <div class="col-md-6"><label class="form-label text-white-50">Nome da Empresa</label><input
-                                    type="text" class="form-control form-control-glass" required></div>
-                            <div class="col-md-6"><label class="form-label text-white-50">Código do
-                                    Projeto</label><input type="text" class="form-control form-control-glass" required>
-                            </div>
-                            <div class="col-md-6"><label class="form-label text-white-50">Montador
-                                    Responsável</label><select class="form-select form-select-glass">
-                                    <option selected>Selecione...</option>
-                                    <option>Carlos Silva</option>
-                                </select></div>
-                            <div class="col-md-6"><label class="form-label text-white-50">Status Inicial</label><select
-                                    class="form-select form-select-glass">
-                                    <option>Pendente</option>
-                                    <option>Em Montagem</option>
-                                </select></div>
-                            <div class="col-md-6"><label class="form-label text-white-50">Data de Cadastro</label><input
-                                    type="date" class="form-control form-control-glass"></div>
-                            <div class="col-md-6"><label class="form-label text-white-50">Data de Entrega</label><input
-                                    type="date" class="form-control form-control-glass"></div>
-                            <div class="col-12"><label class="form-label text-white-50">Descrição</label><textarea
-                                    class="form-control form-control-glass" rows="2"></textarea></div>
+                            <div class="col-md-6"><label for="nomeEmpresa" class="form-label text-white-50">Nome da Empresa</label><input id="nomeEmpresa" type="text" class="form-control form-control-glass" required></div>
+                            <div class="col-md-6"><label for="codigoProjeto" class="form-label text-white-50">Código do Projeto</label><input id="codigoProjeto" type="text" class="form-control form-control-glass" required></div>
+                            <div class="col-md-6"><label for="montadorResponsavel" class="form-label text-white-50">Montador Responsável</label><select id="montadorResponsavel" class="form-select form-select-glass" required></select></div>
+                            <div class="col-md-6"><label for="statusInicial" class="form-label text-white-50">Status Inicial</label><select id="statusInicial" class="form-select form-select-glass"><option>Pendente</option><option>Em Montagem</option><option>Concluído</option></select></div>
+                            <div class="col-md-6"><label for="dataCadastro" class="form-label text-white-50">Data de Cadastro</label><input id="dataCadastro" type="date" class="form-control form-control-glass" required></div>
+                            <div class="col-md-6"><label for="dataEntrega" class="form-label text-white-50">Data de Entrega</label><input id="dataEntrega" type="date" class="form-control form-control-glass"></div>
+                            <div class="col-12"><label for="descricao" class="form-label text-white-50">Descrição</label><textarea id="descricao" class="form-control form-control-glass" rows="2"></textarea></div>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer"><button type="button" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Cancelar</button><button type="button" class="btn btn-primary">Salvar
-                        Projeto</button></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Projeto</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts.js"></script>
 </body>
-
 </html>

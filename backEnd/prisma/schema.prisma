@@ -33,7 +33,7 @@ model Projeto {
   nome_empresa    String
   status          String    // Ex: "Pendente", "Em Montagem", "Concluído"
   descricao       String?   // '?' significa que este campo é opcional
-  data_cadastro   DateTime  @default(now()) // Pega a data/hora atual por padrão
+  data_cadastro   DateTime  
   data_entrega    DateTime?
 
   // Campo que cria a relação com o Montador
