@@ -119,6 +119,37 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="editProjectModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content modal-glass">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 text-white">Editar Projeto</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editProjectForm">
+                    <input type="hidden" id="editProjectId">
+                    
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6"><label for="editNomeEmpresa" class="form-label text-white-50">Nome da Empresa</label><input id="editNomeEmpresa" type="text" class="form-control form-control-glass" required></div>
+                            <div class="col-md-6"><label for="editCodigoProjeto" class="form-label text-white-50">Código do Projeto</label><input id="editCodigoProjeto" type="text" class="form-control form-control-glass" required></div>
+                            <div class="col-md-6"><label for="editMontadorResponsavel" class="form-label text-white-50">Montador Responsável</label><select id="editMontadorResponsavel" class="form-select form-select-glass" required></select></div>
+                            <div class="col-md-6"><label for="editStatus" class="form-label text-white-50">Status</label><select id="editStatus" class="form-select form-select-glass"><option>Pendente</option><option>Em Montagem</option><option>Concluído</option></select></div>
+                            <div class="col-md-6"><label for="editDataCadastro" class="form-label text-white-50">Data de Cadastro</label><input id="editDataCadastro" type="date" class="form-control form-control-glass" required></div>
+                            <div class="col-md-6"><label for="editDataEntrega" class="form-label text-white-50">Data de Entrega</label><input id="editDataEntrega" type="date" class="form-control form-control-glass"></div>
+                            <div class="col-12"><label for="editDescricao" class="form-label text-white-50">Descrição</label><textarea id="editDescricao" class="form-control form-control-glass" rows="2"></textarea></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts.js"></script>

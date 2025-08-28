@@ -50,27 +50,41 @@ router.post('/projetos', verificarToken, async (req, res) => {
 //Put Rota para att 
 
 // ROTA PUT ATUALIZADA COM VERIFICAÇÃO DE EXISTÊNCIA
+// ROTA PUT ATUALIZADA E ROBUSTA
 router.put('/projetos/:id', verificarToken, async (req, res) => {
     const { id } = req.params;
-    const dadosParaAtualizar = req.body; // Pega todos os dados do corpo
+    const dadosRecebidos = req.body;
 
     try {
-        // PASSO A: Primeiro, vamos verificar se o projeto realmente existe
+        // PASSO A: Primeiro, verificar se o projeto que queremos editar realmente existe
         const projetoExistente = await prisma.projeto.findUnique({
             where: { id: parseInt(id) },
         });
 
-        // Se ele não existir (retornar null), enviamos um erro 404
         if (!projetoExistente) {
-            return res.status(404).json({ message: "Projeto não encontrado." });
+            return res.status(404).json({ message: "Projeto não encontrado para atualizar." });
         }
 
-        // PASSO B: Se ele existe, aí sim, nós o atualizamos
+        // PASSO B: Preparar os dados para atualização, convertendo o que for necessário
+        const dadosParaAtualizar = { ...dadosRecebidos }; // Copia os dados recebidos
+
+        // Se a data_cadastro foi enviada, converte para o formato Date
+        if (dadosRecebidos.data_cadastro) {
+            dadosParaAtualizar.data_cadastro = new Date(dadosRecebidos.data_cadastro);
+        }
+
+        // Se a data_entrega foi enviada, converte para o formato Date
+        if (dadosRecebidos.data_entrega) {
+            dadosParaAtualizar.data_entrega = new Date(dadosRecebidos.data_entrega);
+        } else if (dadosRecebidos.data_entrega === null || dadosRecebidos.data_entrega === '') {
+            // Isso permite que a data de entrega seja apagada (definida como nula)
+            dadosParaAtualizar.data_entrega = null;
+        }
+
+        // PASSO C: Se tudo estiver certo, atualizar o projeto
         const projetoAtualizado = await prisma.projeto.update({
-            where: {
-                id: parseInt(id),
-            },
-            data: dadosParaAtualizar, 
+            where: { id: parseInt(id) },
+            data: dadosParaAtualizar,
         });
 
         res.status(200).json(projetoAtualizado);
@@ -80,7 +94,35 @@ router.put('/projetos/:id', verificarToken, async (req, res) => {
         res.status(500).json({ message: "Erro ao atualizar projeto." });
     }
 });
+//  NOVA ROTA: GET para buscar UM ÚNICO projeto por ID
+// =========================================================
+router.get('/projetos/:id', verificarToken, async (req, res) => {
+    const { id } = req.params;
 
+    try {
+        const projeto = await prisma.projeto.findUnique({
+            where: {
+                id: parseInt(id)
+            },
+            // Usamos 'include' para também trazer os dados do montador associado
+            include: {
+                montador: true,
+            }
+        });
+
+        // Se o projeto com esse ID não for encontrado
+        if (!projeto) {
+            return res.status(404).json({ message: "Projeto não encontrado." });
+        }
+
+        // Se encontrou, envia os dados do projeto
+        res.status(200).json(projeto);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erro ao buscar dados do projeto." });
+    }
+});
 // Rota para deletar arquivos 
 
 router.delete('/projetos/:id', verificarToken, async (req, res) => {
