@@ -21,6 +21,8 @@ app.get('/', (req, res) => {
 app.use('/api', userRoutes);
 app.use('/api', projectRoutes);
 app.use('/api', montadorRoutes);
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`)
-})
+//app.listen(PORT, () => {
+ //   console.log(`Servidor rodando na porta ${PORT}`)
+//})
+
+module.exports = app;
