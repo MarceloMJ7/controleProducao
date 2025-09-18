@@ -1,4 +1,10 @@
 /* ============================================= */
+/* CONFIGURAÇÃO GLOBAL DA API           */
+/* ============================================= */
+const API_BASE_URL = 'https://controle-producao.vercel.app';
+
+
+/* ============================================= */
 /* LÓGICA GLOBAL (SEGURANÇA E PERSONALIZAÇÃO)    */
 /* ============================================= */
 document.addEventListener('DOMContentLoaded', function() {
@@ -17,18 +23,18 @@ async function carregarDadosUsuario() {
       return;
   }
   try {
-      const response = await fetch('http://localhost:3001/api/usuarios/perfil', {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-          const usuario = await response.json();
-          const elementoNome = document.getElementById('nomeUsuarioLogado');
-          if (elementoNome) elementoNome.textContent = usuario.nome;
-      } else {
-          localStorage.removeItem('authToken');
-          window.location.href = 'login.html';
-      }
+    const response = await fetch(`${API_BASE_URL}/api/usuarios/perfil`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (response.ok) {
+        const usuario = await response.json();
+        const elementoNome = document.getElementById('nomeUsuarioLogado');
+        if (elementoNome) elementoNome.textContent = usuario.nome;
+    } else {
+        localStorage.removeItem('authToken');
+        window.location.href = 'login.html';
+    }
   } catch (error) {
       console.error('Erro ao buscar dados do usuário:', error);
       localStorage.removeItem('authToken');
@@ -54,7 +60,7 @@ if (cadastroForm) {
           return;
       }
       try {
-          const response = await fetch('http://localhost:3001/api/usuarios', {
+          const response = await fetch(`${API_BASE_URL}/api/usuarios`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ nome, numero_registro, email, senha }),
@@ -82,7 +88,7 @@ if (loginForm) {
       const numero_registro = document.getElementById('numero_registro').value;
       const senha = document.getElementById('senha').value;
       try {
-          const response = await fetch('http://localhost:3001/api/login', {
+          const response = await fetch(`${API_BASE_URL}/api/login`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ numero_registro, senha }),
@@ -139,7 +145,7 @@ if (tabelaProjetosCorpo) {
       document.getElementById('projectDetailsCard').classList.add('d-none');
       const token = localStorage.getItem('authToken');
       try {
-          const response = await fetch('http://localhost:3001/api/projetos', {
+          const response = await fetch(`${API_BASE_URL}/api/projetos`, {
               headers: { 'Authorization': `Bearer ${token}` }
           });
           if (!response.ok) throw new Error('Falha ao buscar projetos.');
@@ -174,7 +180,7 @@ if (tabelaProjetosCorpo) {
   async function deletarProjeto(id) {
       const token = localStorage.getItem('authToken');
       try {
-          const response = await fetch(`http://localhost:3001/api/projetos/${id}`, {
+          const response = await fetch(`${API_BASE_URL}/api/projetos/${id}`, {
               method: 'DELETE',
               headers: { 'Authorization': `Bearer ${token}` }
           });
@@ -193,12 +199,12 @@ if (tabelaProjetosCorpo) {
   async function abrirModalDeEdicao(id) {
       try {
           const token = localStorage.getItem('authToken');
-          const response = await fetch(`http://localhost:3001/api/projetos/${id}`, {
+          const response = await fetch(`${API_BASE_URL}/api/projetos/${id}`, {
               headers: { 'Authorization': `Bearer ${token}` }
           });
           if (!response.ok) throw new Error('Falha ao buscar dados do projeto.');
           const projeto = await response.json();
-          const montadoresResponse = await fetch('http://localhost:3001/api/montadores', {
+          const montadoresResponse = await fetch(`${API_BASE_URL}/api/montadores`, {
               headers: { 'Authorization': `Bearer ${token}` }
           });
           if (!montadoresResponse.ok) throw new Error('Falha ao buscar montadores.');
@@ -236,7 +242,7 @@ if (tabelaProjetosCorpo) {
       addProjectModal.addEventListener('show.bs.modal', async () => {
           try {
               const token = localStorage.getItem('authToken');
-              const response = await fetch('http://localhost:3001/api/montadores', {
+              const response = await fetch(`${API_BASE_URL}/api/montadores`, {
                   headers: { 'Authorization': `Bearer ${token}` }
               });
               if (!response.ok) throw new Error('Falha ao buscar montadores.');
@@ -272,7 +278,7 @@ if (tabelaProjetosCorpo) {
           };
           try {
               const token = localStorage.getItem('authToken');
-              const response = await fetch('http://localhost:3001/api/projetos', {
+              const response = await fetch(`${API_BASE_URL}/api/projetos`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                   body: JSON.stringify(dadosDoProjeto)
@@ -294,7 +300,6 @@ if (tabelaProjetosCorpo) {
 
   const editProjectForm = document.getElementById('editProjectForm');
   if(editProjectForm) {
-      // CORREÇÃO: A lógica que faltava foi adicionada aqui
       editProjectForm.addEventListener('submit', async function(event) {
           event.preventDefault();
           const id = document.getElementById('editProjectId').value;
@@ -309,7 +314,7 @@ if (tabelaProjetosCorpo) {
           };
           try {
               const token = localStorage.getItem('authToken');
-              const response = await fetch(`http://localhost:3001/api/projetos/${id}`, {
+              const response = await fetch(`${API_BASE_URL}/api/projetos/${id}`, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                   body: JSON.stringify(dadosAtualizados)
