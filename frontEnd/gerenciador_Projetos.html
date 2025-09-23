@@ -29,23 +29,23 @@
             </div>
             <div class="card glass-card">
                 <div class="card-header border-bottom border-secondary border-opacity-25">
-                    <form class="row g-3 align-items-center">
+                    <div class="row g-3 align-items-center">
                         <div class="col-md-8">
                             <div class="input-group">
                                 <span class="input-group-text input-group-text-glass"><i class="fas fa-search"></i></span>
-                                <input type="text" class="form-control form-control-glass" placeholder="Buscar por código ou empresa...">
+                                <input type="text" class="form-control form-control-glass" id="filtroNome" placeholder="Buscar por nome da empresa...">
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <select class="form-select form-select-glass">
-                                <option selected>Filtrar por Status...</option>
-                                <option>Pendente</option>
-                                <option>Em Montagem</option>
-                                <option>Concluído</option>
+                            <select class="form-select form-select-glass" id="filtroStatus">
+                                <option value="">Todos os Status</option>
+                                <option value="Pendente">Pendente</option>
+                                <option value="Em Montagem">Em Montagem</option>
+                                <option value="Concluído">Concluído</option>
                             </select>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                    </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover table-glass">
@@ -80,8 +80,8 @@
                                     <p class="text-white-50 mb-1">Montador</p>
                                     <p class="fw-bold text-white" id="projectAssemblerDetail"></p>
                                 </div>
-                                <div class="col-md-3">
-                                    <p class="text-white-50 mb-1">Status</p>
+                                <div class="col-md-3"> 
+                                    <p class="text-white-50 mb-1" >Status</p>
                                     <div id="projectStatusDetail"></div>
                                 </div>
                             </div>
@@ -129,7 +129,6 @@
                 </div>
                 <form id="editProjectForm">
                     <input type="hidden" id="editProjectId">
-                    
                     <div class="modal-body">
                         <div class="row g-3">
                             <div class="col-md-6"><label for="editNomeEmpresa" class="form-label text-white-50">Nome da Empresa</label><input id="editNomeEmpresa" type="text" class="form-control form-control-glass" required></div>
@@ -149,7 +148,6 @@
             </div>
         </div>
     </div>
-
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts.js"></script>

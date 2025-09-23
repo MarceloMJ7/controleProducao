@@ -8,19 +8,37 @@ const prisma = new PrismaClient();
 // =========================================================
 //  ROTA PROTEGIDA PARA BUSCAR TODOS OS PROJETOS
 // =========================================================
+// Rota para listar todos os projetos (com filtros)
 router.get('/projetos', verificarToken, async (req, res) => {
-    // Se o código chegou até aqui, significa que o token é válido
-    // e o middleware `verificarToken` chamou a função next().
+    // Extrai os possíveis filtros da URL (ex: /api/projetos?nome=...&status=...)
+    const { nome, status } = req.query;
 
     try {
+        // Cria um objeto 'where' para a consulta do Prisma
+        const where = {};
+
+        // Se um 'nome' foi fornecido, adiciona um filtro de nome da empresa
+        if (nome) {
+            where.nome_empresa = {
+                contains: nome, // Procura por texto que "contém" o valor
+                mode: 'insensitive' // Ignora maiúsculas/minúsculas
+            };
+        }
+
+        // Se um 'status' foi fornecido, adiciona um filtro de status
+        if (status) {
+            where.status = status;
+        }
+
         const projetos = await prisma.projeto.findMany({
-            include: {
-                montador: true // Inclui os dados do montador relacionado
-            }
+            where: where, // Usa o objeto de filtros que construímos
+            include: { montador: true },
+            orderBy: { data_cadastro: 'desc' }
         });
-        res.status(200).json(projetos);
+        res.json(projetos);
     } catch (error) {
-        res.status(500).json({ message: "Erro ao buscar projetos." });
+        console.error(error); // Bom para ver o erro detalhado no log da Vercel
+        res.status(500).json({ message: 'Erro ao buscar projetos.' });
     }
 });
 
