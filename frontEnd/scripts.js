@@ -1,7 +1,7 @@
 /* ============================================= */
 /* CONFIGURAÇÃO GLOBAL DA API                    */
 /* ============================================= */
-const API_BASE_URL = 'http://localhost:3001'; //URL atual 
+const API_BASE_URL = 'https://controleproducao.onrender.com'; //URL atual 
 
 
 /* ============================================= */
