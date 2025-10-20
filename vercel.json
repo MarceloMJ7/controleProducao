@@ -10,4 +10,4 @@
       { "source": "/esqueci-senha", "destination": "/frontEnd/forgotPass.html" },
       { "source": "/(..*)", "destination": "/frontEnd/$1" }
     ]
-  }
+  } 
