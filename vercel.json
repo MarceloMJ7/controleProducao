@@ -1,0 +1,13 @@
+{
+    "rewrites": [
+      { "source": "/", "destination": "/frontEnd/login.html" },
+      { "source": "/login", "destination": "/frontEnd/login.html" },
+      { "source": "/cadastro", "destination": "/frontEnd/cadastro.html" },
+      { "source": "/dashboard", "destination": "/frontEnd/dashboard.html" },
+      { "source": "/projetos", "destination": "/frontEnd/gerenciador_Projetos.html" },
+      { "source": "/montadores", "destination": "/frontEnd/gerenciador_Montadores.html" },
+      { "source": "/relatorios", "destination": "/frontEnd/relatorios.html" },
+      { "source": "/esqueci-senha", "destination": "/frontEnd/forgotPass.html" },
+      { "source": "/(..*)", "destination": "/frontEnd/$1" }
+    ]
+  }
