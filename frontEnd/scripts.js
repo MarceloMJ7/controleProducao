@@ -1,8 +1,8 @@
 /* ============================================= */
 /* CONFIGURAÇÃO GLOBAL DA API                      */
 /* ============================================= */
-const API_BASE_URL = "http://localhost:3001";
-//const API_BASE_URL = 'https://controleproducao.onrender.com'; //URL para deploy
+//const API_BASE_URL = "http://localhost:3001";
+const API_BASE_URL = "https://controleproducao.onrender.com"; //URL para deploy
 
 /* ============================================= */
 /* LÓGICA GLOBAL (SEGURANÇA E PERSONALIZAÇÃO)    */
