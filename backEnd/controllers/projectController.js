@@ -2,16 +2,25 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 // Lógica para LISTAR todos os projetos (com filtros)
+// Em exports.getAllProjects
 exports.getAllProjects = async (req, res) => {
     const { nome, status } = req.query;
+    // Pega o ID do usuário logado
+    const usuarioId = req.usuarioId;
+
     try {
-        const where = {};
+        const where = {
+            // FILTRO DE AUTORIZAÇÃO OBRIGATÓRIO!
+            criadoPorId: usuarioId 
+        };
+
         if (nome) {
             where.nome_empresa = { contains: nome, mode: 'insensitive' };
         }
         if (status) {
             where.status = status;
         }
+
         const projetos = await prisma.projeto.findMany({
             where: where,
             include: { montador: true },
@@ -25,8 +34,13 @@ exports.getAllProjects = async (req, res) => {
 };
 
 // Lógica para CRIAR um novo projeto
+// Em exports.createProject
 exports.createProject = async (req, res) => {
     const { codigo_projeto, nome_empresa, status, descricao, data_cadastro, data_entrega, montadorId } = req.body;
+
+    // Pega o ID do usuário que o middleware 'verificarToken' nos deu
+    const criadorId = req.usuarioId; 
+
     try {
         const novoProjeto = await prisma.projeto.create({
             data: {
@@ -37,6 +51,9 @@ exports.createProject = async (req, res) => {
                 data_cadastro: new Date(data_cadastro),
                 data_entrega: data_entrega ? new Date(data_entrega) : null,
                 montadorId: parseInt(montadorId),
+
+                // A LIGAÇÃO É FEITA AQUI:
+                criadoPorId: criadorId
             }
         });
         res.status(201).json(novoProjeto);

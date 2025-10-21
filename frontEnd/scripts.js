@@ -3,7 +3,6 @@
 /* ============================================= */
 const API_BASE_URL = 'https://controleproducao.onrender.com'; //URL atual 
 
-
 /* ============================================= */
 /* LÓGICA GLOBAL (SEGURANÇA E PERSONALIZAÇÃO)    */
 /* ============================================= */
@@ -24,7 +23,8 @@ async function carregarDadosUsuario() {
         return;
     }
     try {
-        const response = await fetch(`${API_BASE_URL}/api/usuarios/perfil`, {
+        // ### CORREÇÃO 1 ###
+        const response = await fetch(`${API_BASE_URL}/api/users/perfil`, {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -44,7 +44,7 @@ async function carregarDadosUsuario() {
 }
 
 /* ============================================= */
-/* LÓGICA DA TELA DE CADASTRO                    */
+/* LÓGICA DA TELA DE CADASTRO                      */
 /* ============================================= */
 const cadastroForm = document.getElementById('cadastroForm');
 if (cadastroForm) {
@@ -60,7 +60,8 @@ if (cadastroForm) {
             return alert('As senhas não coincidem!');
         }
         try {
-            const response = await fetch(`${API_BASE_URL}/api/usuarios`, {
+            // ### CORREÇÃO 2 ###
+            const response = await fetch(`${API_BASE_URL}/api/users/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nome, numero_registro, email, senha }),
@@ -79,16 +80,17 @@ if (cadastroForm) {
 }
 
 /* ============================================= */
-/* LÓGICA DA TELA DE LOGIN                       */
+/* LÓGICA DA TELA DE LOGIN                         */
 /* ============================================= */
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', async function (event) {
         event.preventDefault();
-        const numero_registro = document.getElementById('numero_registro').value;
+        const numero_registro = document.getElementById('numero_registro').value.trim();
         const senha = document.getElementById('senha').value;
         try {
-            const response = await fetch(`${API_BASE_URL}/api/login`, {
+            // ### CORREÇÃO 3 ###
+            const response = await fetch(`${API_BASE_URL}/api/users/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ numero_registro, senha }),
@@ -106,7 +108,6 @@ if (loginForm) {
         }
     });
 }
-
 /* ============================================= */
 /* LÓGICA DA TELA DE PROJETOS (CRUD COMPLETO)    */
 /* ============================================= */

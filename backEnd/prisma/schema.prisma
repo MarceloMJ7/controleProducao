@@ -4,40 +4,41 @@ datasource db {
   url      = env("DATABASE_URL") // Lê a URL de conexão do arquivo .env
 }
 
-// Este é o gerador do cliente Prisma para o nosso código
-generator client {
-  provider = "prisma-client-js"
-}
+// Dentro do backend/schema.prisma
 
-// Modelo de dados para o Usuário (Encarregado)
 model Usuario {
-  id              Int    @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
   nome            String
-  numero_registro String @unique
-  email           String @unique
+  numero_registro String    @unique
+  email           String    @unique
   senha           String
+  
+  // ADICIONE ESTA LINHA PARA A RELAÇÃO INVERSA
+  projetos        Projeto[]
 }
 
-// Modelo de dados para o Montador
 model Montador {
+  // ... seu modelo Montador continua igual ...
   id              Int      @id @default(autoincrement())
   nome            String
   numero_registro String   @unique
-  projetos        Projeto[] // Relação: um montador pode ter vários projetos
+  projetos        Projeto[]
 }
 
-// Modelo de dados para o Projeto
 model Projeto {
   id              Int       @id @default(autoincrement())
   codigo_projeto  String
   nome_empresa    String
-  status          String    // Ex: "Pendente", "Em Montagem", "Concluído"
-  descricao       String?   // '?' significa que este campo é opcional
-  data_cadastro   DateTime  
+  status          String
+  descricao       String?
+  data_cadastro   DateTime
   data_entrega    DateTime?
 
-  // Campo que cria a relação com o Montador
+  // --- ADICIONE ESTAS DUAS LINHAS PARA GUARDAR O CRIADOR ---
+  criadoPorId     Int
+  criadoPor       Usuario   @relation(fields: [criadoPorId], references: [id])
+  // -----------------------------------------------------------
+
   montadorId      Int
-  // Definindo a relação formalmente
   montador        Montador  @relation(fields: [montadorId], references: [id])
 }
