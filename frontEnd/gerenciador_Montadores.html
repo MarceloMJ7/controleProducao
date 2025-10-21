@@ -56,19 +56,71 @@
                                 </tr>
                             </thead>
                             <tbody id="montadoresTabela">
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
         </div>
     </main>
 
     <div class="modal fade" id="addMontadorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content modal-glass">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 text-white">Adicionar Novo Montador</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addMontadorForm">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="addNomeMontador" class="form-label text-white-50">Nome Completo</label>
+                                <input id="addNomeMontador" type="text" class="form-control form-control-glass" placeholder="Ex: Carlos Silva" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="addNumRegistroMontador" class="form-label text-white-50">Nº de Matrícula</label>
+                                <input id="addNumRegistroMontador" type="text" class="form-control form-control-glass" placeholder="Ex: 1024" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="addMontadorForm" class="btn btn-primary">Salvar Montador</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="modal fade" id="editMontadorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content modal-glass">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 text-white">Editar Montador</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editMontadorForm">
+                        <input type="hidden" id="editMontadorId">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="editNomeMontador" class="form-label text-white-50">Nome Completo</label>
+                                <input id="editNomeMontador" type="text" class="form-control form-control-glass" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editNumRegistroMontador" class="form-label text-white-50">Nº de Matrícula</label>
+                                <input id="editNumRegistroMontador" type="text" class="form-control form-control-glass" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="editMontadorForm" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

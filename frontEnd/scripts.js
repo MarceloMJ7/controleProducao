@@ -1,8 +1,8 @@
 /* ============================================= */
 /* CONFIGURAÇÃO GLOBAL DA API                      */
 /* ============================================= */
-//const API_BASE_URL = "http://localhost:3001";
 const API_BASE_URL = "https://controleproducao.onrender.com"; //URL para deploy
+//const API_BASE_URL = "http://localhost:3001";
 
 /* ============================================= */
 /* LÓGICA GLOBAL (SEGURANÇA E PERSONALIZAÇÃO)    */
@@ -27,7 +27,7 @@ async function carregarDadosUsuario() {
     const response = await fetch(`${API_BASE_URL}/api/users/perfil`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
-      cache: "no-cache", // Adicionado para robustez
+      cache: "no-cache",
     });
     if (response.ok) {
       const usuario = await response.json();
@@ -141,17 +141,12 @@ if (tabelaProjetosCorpo) {
     const linhaClicada = targetElement.closest("tr");
     if (!linhaClicada || !linhaClicada.dataset.id) return;
     const idDoProjeto = linhaClicada.dataset.id;
-
-    const deleteButton = targetElement.closest(".btn-delete");
-    if (deleteButton) {
+    if (targetElement.closest(".btn-delete")) {
       event.preventDefault();
       if (confirm("Você tem certeza que deseja excluir este projeto?")) {
         deletarProjeto(idDoProjeto);
       }
-    }
-
-    const editButton = targetElement.closest(".btn-edit");
-    if (editButton) {
+    } else if (targetElement.closest(".btn-edit")) {
       event.preventDefault();
       abrirModalDeEdicao(idDoProjeto);
     }
@@ -160,40 +155,34 @@ if (tabelaProjetosCorpo) {
   async function carregarProjetos() {
     const token = localStorage.getItem("authToken");
     if (!token) return;
-
     const nome = filtroNomeInput ? filtroNomeInput.value : "";
     const status = filtroStatusSelect ? filtroStatusSelect.value : "";
-
     let url = `${API_BASE_URL}/api/projects`;
     const params = new URLSearchParams();
     if (nome) params.append("nome", nome);
     if (status) params.append("status", status);
     if (params.toString()) url += `?${params.toString()}`;
-
     try {
       const response = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
-        cache: "no-cache", // ### CORREÇÃO APLICADA ###
+        cache: "no-cache",
       });
       if (!response.ok) throw new Error("Falha ao buscar projetos.");
       const projetos = await response.json();
       tabelaProjetosCorpo.innerHTML = "";
-
       if (projetos.length === 0) {
         tabelaProjetosCorpo.innerHTML = `<tr><td colspan="6" class="text-center text-white-50">Nenhum projeto encontrado.</td></tr>`;
         return;
       }
-
       projetos.forEach((projeto) => {
-        const dataCadastro = new Date(projeto.data_cadastro).toLocaleDateString(
-          "pt-BR"
-        );
+        const dataCadastro = new Date(
+          projeto.data_cadastro
+        ).toLocaleDateString("pt-BR");
         const dataEntrega = projeto.data_entrega
           ? new Date(projeto.data_entrega).toLocaleDateString("pt-BR")
           : "N/A";
         const nomeMontador = projeto.montador ? projeto.montador.nome : "N/A";
         const badgeClass = getBadgeClass(projeto.status);
-
         const novaLinhaHTML = `
                 <tr data-id="${
                   projeto.id
@@ -247,7 +236,6 @@ if (tabelaProjetosCorpo) {
       });
       if (!response.ok) throw new Error("Falha ao buscar dados do projeto.");
       const projeto = await response.json();
-
       const montadoresResponse = await fetch(`${API_BASE_URL}/api/montadores`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-cache",
@@ -255,13 +243,11 @@ if (tabelaProjetosCorpo) {
       if (!montadoresResponse.ok)
         throw new Error("Falha ao buscar montadores.");
       const montadores = await montadoresResponse.json();
-
       const montadorSelect = document.getElementById("editMontadorResponsavel");
       montadorSelect.innerHTML = "";
       montadores.forEach((montador) => {
         montadorSelect.innerHTML += `<option value="${montador.id}">${montador.nome}</option>`;
       });
-
       document.getElementById("editProjectId").value = projeto.id;
       document.getElementById("editNomeEmpresa").value = projeto.nome_empresa;
       document.getElementById("editCodigoProjeto").value =
@@ -278,7 +264,6 @@ if (tabelaProjetosCorpo) {
       document.getElementById("editDataEntrega").value = projeto.data_entrega
         ? new Date(projeto.data_entrega).toISOString().split("T")[0]
         : "";
-
       const modal = new bootstrap.Modal(
         document.getElementById("editProjectModal")
       );
@@ -300,7 +285,6 @@ if (tabelaProjetosCorpo) {
         });
         if (!response.ok) throw new Error("Falha ao buscar montadores.");
         const montadores = await response.json();
-
         const montadorSelect = document.getElementById("montadorResponsavel");
         montadorSelect.innerHTML = '<option value="">Selecione...</option>';
         montadores.forEach((montador) => {
@@ -313,7 +297,6 @@ if (tabelaProjetosCorpo) {
         alert(error.message);
       }
     });
-
     addProjectForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       const dadosDoProjeto = {
@@ -412,7 +395,6 @@ if (tabelaMontadoresCorpo) {
 
   tabelaMontadoresCorpo.addEventListener("click", function (event) {
     const targetElement = event.target;
-
     const deleteButton = targetElement.closest(".btn-delete-montador");
     if (deleteButton) {
       event.preventDefault();
@@ -427,7 +409,6 @@ if (tabelaMontadoresCorpo) {
         deletarMontador(montadorId);
       }
     }
-
     const editButton = targetElement.closest(".btn-edit-montador");
     if (editButton) {
       event.preventDefault();
@@ -452,23 +433,16 @@ async function carregarMontadores() {
   try {
     const response = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
-      cache: "no-cache", // ### CORREÇÃO APLICADA ###
+      cache: "no-cache",
     });
+
     if (!response.ok) {
-      const errorText = await response.text();
-      try {
-        const errorJson = JSON.parse(errorText);
-        throw new Error(
-          errorJson.message || "Falha ao buscar a lista de montadores."
-        );
-      } catch (e) {
-        throw new Error(
-          "Falha ao buscar a lista de montadores. Resposta inesperada do servidor."
-        );
-      }
+      throw new Error("Falha ao buscar a lista de montadores.");
     }
 
     const montadores = await response.json();
+
+    console.log("DADOS RECEBIDOS PELO FRONT-END:", montadores);
     tabelaMontadoresCorpo.innerHTML = "";
 
     if (montadores.length === 0) {
@@ -476,13 +450,22 @@ async function carregarMontadores() {
       return;
     }
 
+    // ### INÍCIO DA ATUALIZAÇÃO PARA EXIBIR ESTATÍSTICAS ###
     montadores.forEach((montador) => {
       const linhaHTML = `
         <tr data-id="${montador.id}">
           <td>${montador.numero_registro}</td>
           <td>${montador.nome}</td>
-          <td class="text-center fw-bold">?</td>
-          <td class="text-center"><span class="badge text-bg-secondary rounded-pill">?</span></td>
+          <td class="text-center fw-bold">${montador.concluidosNoMes}</td>
+          <td class="text-center">
+            <span class="badge ${
+              montador.projetosAtivos > 0
+                ? "text-bg-primary"
+                : "text-bg-secondary"
+            } rounded-pill">
+                ${montador.projetosAtivos}
+            </span>
+          </td>
           <td class="text-end">
             <a href="#" class="btn btn-sm btn-outline-light me-2 btn-edit-montador" title="Editar"><i class="fas fa-edit"></i></a>
             <a href="#" class="btn btn-sm btn-outline-danger btn-delete-montador" title="Excluir"><i class="fas fa-trash-alt"></i></a>
@@ -490,6 +473,7 @@ async function carregarMontadores() {
         </tr>`;
       tabelaMontadoresCorpo.innerHTML += linhaHTML;
     });
+    // ### FIM DA ATUALIZAÇÃO ###
   } catch (error) {
     tabelaMontadoresCorpo.innerHTML = `<tr><td colspan="5" class="text-center text-danger">${error.message}</td></tr>`;
   }

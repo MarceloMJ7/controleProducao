@@ -4,46 +4,48 @@ datasource db {
   url      = env("DATABASE_URL") // Lê a URL de conexão do arquivo .env
 }
 
-// Bloco do gerador de cliente (ADICIONE ESTE BLOCO)
+// Bloco do gerador de cliente
 generator client {
   provider = "prisma-client-js"
 }
 
-// Dentro do backend/schema.prisma
-
+// Modelo para os usuários da aplicação
 model Usuario {
   id              Int       @id @default(autoincrement())
   nome            String
   numero_registro String    @unique
   email           String    @unique
   senha           String
-  
-  // ADICIONE ESTA LINHA PARA A RELAÇÃO INVERSA
+
+  // Relação: Um usuário pode criar muitos projetos
   projetos        Projeto[]
 }
 
+// Modelo para os montadores
 model Montador {
-  // ... seu modelo Montador continua igual ...
-  id              Int      @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
   nome            String
-  numero_registro String   @unique
+  numero_registro String    @unique
+
+  // Relação: Um montador pode ser associado a muitos projetos
   projetos        Projeto[]
 }
 
+// Modelo para os projetos
 model Projeto {
-  id              Int       @id @default(autoincrement())
-  codigo_projeto  String
-  nome_empresa    String
-  status          String
-  descricao       String?
-  data_cadastro   DateTime
-  data_entrega    DateTime?
+  id               Int       @id @default(autoincrement())
+  codigo_projeto   String
+  nome_empresa     String
+  status           String
+  descricao        String?
+  data_cadastro    DateTime
+  data_entrega     DateTime?
 
-  // --- ADICIONE ESTAS DUAS LINHAS PARA GUARDAR O CRIADOR ---
-  criadoPorId     Int
-  criadoPor       Usuario   @relation(fields: [criadoPorId], references: [id])
-  // -----------------------------------------------------------
+  // Relação com o usuário criador (Obrigatória)
+  criadoPorId      Int
+  criadoPor        Usuario   @relation(fields: [criadoPorId], references: [id])
 
-  montadorId      Int
-  montador        Montador  @relation(fields: [montadorId], references: [id])
+  // Relação com o montador responsável (OPCIONAL)
+  montadorId       Int?      // <-- CORREÇÃO APLICADA AQUI
+  montador         Montador? @relation(fields: [montadorId], references: [id]) // <-- CORREÇÃO APLICADA AQUI
 }
