@@ -1,28 +1,25 @@
 // backend/routes/projectRoutes.js
-
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-// 1. Importar o nosso "segurança" e o nosso novo "livro de receitas"
-const verificarToken = require('../middleware/authMiddleware');
-const projectController = require('../controllers/projectController');
+const verificarToken = require("../middleware/authMiddleware");
+const projectController = require("../controllers/projectController");
 
-// 2. Definir as rotas, agora muito mais limpas
-// Cada rota chama o segurança e depois a função correspondente do controlador
+// --- ROTAS SIMPLIFICADAS E CORRIGIDAS ---
 
-// Rota para listar todos os projetos (com filtros)
-router.get('/projetos', verificarToken, projectController.getAllProjects);
+// Rota para listar todos os projetos (GET /api/projects)
+router.get("/", verificarToken, projectController.getAllProjects);
 
-// Rota para criar um novo projeto
-router.post('/projetos', verificarToken, projectController.createProject);
+// Rota para criar um novo projeto (POST /api/projects)
+router.post("/", verificarToken, projectController.createProject);
 
-// Rota para buscar um projeto específico por ID
-router.get('/projetos/:id', verificarToken, projectController.getProjectById);
+// Rota para buscar um projeto específico por ID (GET /api/projects/123)
+router.get("/:id", verificarToken, projectController.getProjectById);
 
-// Rota para atualizar um projeto
-router.put('/projetos/:id', verificarToken, projectController.updateProject);
+// Rota para atualizar um projeto (PUT /api/projects/123)
+router.put("/:id", verificarToken, projectController.updateProject);
 
-// Rota para deletar um projeto
-router.delete('/projetos/:id', verificarToken, projectController.deleteProject);
+// Rota para deletar um projeto (DELETE /api/projects/123)
+router.delete("/:id", verificarToken, projectController.deleteProject);
 
 module.exports = router;
