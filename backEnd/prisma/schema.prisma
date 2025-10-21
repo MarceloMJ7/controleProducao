@@ -4,6 +4,11 @@ datasource db {
   url      = env("DATABASE_URL") // Lê a URL de conexão do arquivo .env
 }
 
+// Bloco do gerador de cliente (ADICIONE ESTE BLOCO)
+generator client {
+  provider = "prisma-client-js"
+}
+
 // Dentro do backend/schema.prisma
 
 model Usuario {

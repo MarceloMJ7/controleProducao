@@ -37,7 +37,10 @@
             <h1 class="h2 text-white mb-4">Gerenciar Montadores</h1>
             <div class="card glass-card">
                 <div class="card-header border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
-                    <div class="input-group" style="max-width: 50%;"><span class="input-group-text input-group-text-glass"><i class="fas fa-search"></i></span><input type="text" class="form-control form-control-glass" placeholder="Buscar montador por nome..."></div>
+                    <div class="input-group" style="max-width: 50%;">
+                        <span class="input-group-text input-group-text-glass"><i class="fas fa-search"></i></span>
+                        <input id="filtroNomeMontador" type="text" class="form-control form-control-glass" placeholder="Buscar montador por nome...">
+                    </div>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMontadorModal"><i class="fas fa-user-plus me-2"></i> Adicionar Montador</button>
                 </div>
                 <div class="card-body">
@@ -53,71 +56,21 @@
                                 </tr>
                             </thead>
                             <tbody id="montadoresTabela">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            
-            <div class="row g-4 mt-3">
-                <div class="col-12">
-                    <div class="card glass-card d-none" id="performanceDetailsCard">
-                        <div class="card-body">
-                            <h5 class="card-title text-white mb-4" id="montadorNomeDetalhe">Detalhes de Desempenho</h5>
-                            <div class="row align-items-center">
-                                <div class="col-md-7">
-                                    <div class="row text-center">
-                                        <div class="col-4">
-                                            <p class="text-white-50 mb-1">Total Concluído</p>
-                                            <p class="fs-2 fw-bold text-white">28</p>
-                                        </div>
-                                        <div class="col-4">
-                                            <p class="text-white-50 mb-1">Em Andamento</p>
-                                            <p class="fs-2 fw-bold text-white">3</p>
-                                        </div>
-                                        <div class="col-4">
-                                            <p class="text-white-50 mb-1">Média / Projeto</p>
-                                            <p class="fs-2 fw-bold text-white">4 dias</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-5"><canvas id="montadorPerformanceChart"></canvas></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </main>
 
     <div class="modal fade" id="addMontadorModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content modal-glass">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5 text-white">Adicionar Novo Montador</h1>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addMontadorForm">
-                        <div class="row g-3">
-                            <div class="col-md-8">
-                                <label class="form-label text-white-50">Nome Completo</label>
-                                <input id="addNomeMontador" type="text" class="form-control form-control-glass" placeholder="Ex: Carlos Silva" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label text-white-50">Nº de Matrícula</label>
-                                <input id="addNumRegistroMontador" type="text" class="form-control form-control-glass" placeholder="Ex: 1024" required>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="addMontadorForm" class="btn btn-primary">Salvar Montador</button>
-                </div>
-            </div>
-        </div>
     </div>
+
+    <div class="modal fade" id="editMontadorModal" tabindex="-1">
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts.js"></script>
 </body>

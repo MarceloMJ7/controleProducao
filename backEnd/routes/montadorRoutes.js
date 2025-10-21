@@ -1,28 +1,25 @@
 // backend/routes/montadorRoutes.js
-
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-// Importar o segurança e o nosso novo controlador de montadores
-const verificarToken = require('../middleware/authMiddleware');
-const montadorController = require('../controllers/montadorController');
+const verificarToken = require("../middleware/authMiddleware");
+const montadorController = require("../controllers/montadorController");
 
-// As URLs são as mesmas, mas agora elas chamam as funções do controlador
-// Note que as URLs aqui são relativas ao prefixo que definimos no server.js (ex: /api/montadores)
+// --- ROTAS NA ORDEM CORRETA ---
 
-// POST /       (Cria um novo montador)
-router.post('/', verificarToken, montadorController.createMontador);
+// POST /api/montadores -> Criar um novo montador
+router.post("/", verificarToken, montadorController.createMontador);
 
-// GET /        (Lista todos os montadores)
-router.get('/', verificarToken, montadorController.getAllMontadores);
+// GET /api/montadores -> Listar TODOS os montadores
+router.get("/", verificarToken, montadorController.getAllMontadores);
 
-// GET /:id     (Busca um montador específico)
-router.get('/:id', verificarToken, montadorController.getMontadorById);
+// GET /api/montadores/:id -> Buscar UM montador específico
+router.get("/:id", verificarToken, montadorController.getMontadorById);
 
-// PUT /:id     (Atualiza um montador específico)
-router.put('/:id', verificarToken, montadorController.updateMontador);
+// PUT /api/montadores/:id -> Atualizar um montador específico
+router.put("/:id", verificarToken, montadorController.updateMontador);
 
-// DELETE /:id  (Deleta um montador específico)
-router.delete('/:id', verificarToken, montadorController.deleteMontador);
+// DELETE /api/montadores/:id -> Deletar um montador específico
+router.delete("/:id", verificarToken, montadorController.deleteMontador);
 
 module.exports = router;
