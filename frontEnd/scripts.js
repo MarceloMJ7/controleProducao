@@ -356,3 +356,112 @@ if (tabelaProjetosCorpo) {
     
     carregarProjetos();
 }
+
+/* ============================================= */
+/* LÓGICA DA TELA DE GESTÃO DE MONTADORES        */
+/* ============================================= */
+const tabelaMontadoresCorpo = document.getElementById('montadoresTabela');
+
+// --- LÓGICA PARA LISTAR OS MONTADORES DINAMICAMENTE ---
+// Verifica se a tabela de montadores existe na página atual. Se sim, executa a função.
+if (tabelaMontadoresCorpo) {
+  carregarMontadores();
+}
+
+// Função assíncrona para buscar os dados dos montadores na API e preencher a tabela
+async function carregarMontadores() {
+  const token = localStorage.getItem('authToken');
+  if (!token) return; // Se não houver token, não faz nada
+
+  // Exibe uma mensagem de carregamento para o utilizador
+  tabelaMontadoresCorpo.innerHTML = `<tr><td colspan="5" class="text-center text-white-50">A carregar montadores...</td></tr>`;
+
+  try {
+    // Faz o pedido GET para a nossa rota que lista os montadores
+    const response = await fetch(`${API_BASE_URL}/api/montadores`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!response.ok) {
+      throw new Error('Falha ao buscar a lista de montadores.');
+    }
+    
+    const montadores = await response.json();
+    
+    // Limpa a tabela antes de adicionar os novos dados
+    tabelaMontadoresCorpo.innerHTML = ''; 
+
+    // Se não houver montadores, exibe uma mensagem informativa
+    if (montadores.length === 0) {
+      tabelaMontadoresCorpo.innerHTML = `<tr><td colspan="5" class="text-center text-white-50">Nenhum montador encontrado. Clique em "Adicionar Montador" para começar.</td></tr>`;
+      return;
+    }
+
+    // Itera sobre cada montador recebido e cria uma linha na tabela
+    montadores.forEach(montador => {
+      // NOTA: As colunas de estatísticas ("Concluídos no Mês" e "Projetos Ativos") estão como placeholders.
+      // Implementaremos o cálculo destes dados no back-end mais tarde.
+      const linhaHTML = `
+        <tr data-id="${montador.id}">
+          <td>${montador.numero_registro}</td>
+          <td>${montador.nome}</td>
+          <td class="text-center fw-bold">?</td>
+          <td class="text-center"><span class="badge text-bg-secondary rounded-pill">?</span></td>
+          <td class="text-end">
+            <a href="#" class="btn btn-sm btn-outline-light me-2 btn-edit-montador" title="Editar"><i class="fas fa-edit"></i></a>
+            <a href="#" class="btn btn-sm btn-outline-danger btn-delete-montador" title="Excluir"><i class="fas fa-trash-alt"></i></a>
+          </td>
+        </tr>`;
+      tabelaMontadoresCorpo.innerHTML += linhaHTML;
+    });
+
+  } catch (error) {
+    tabelaMontadoresCorpo.innerHTML = `<tr><td colspan="5" class="text-center text-danger">${error.message}</td></tr>`;
+  }
+}
+
+
+// --- LÓGICA DO MODAL PARA ADICIONAR UM NOVO MONTADOR ---
+const addMontadorForm = document.getElementById('addMontadorForm');
+const addMontadorModalEl = document.getElementById('addMontadorModal');
+
+if (addMontadorForm && addMontadorModalEl) {
+  // Adiciona um "ouvinte" que espera pelo evento de 'submit' do formulário
+  addMontadorForm.addEventListener('submit', async (event) => {
+    event.preventDefault(); // Impede que a página recarregue
+
+    // Pega os valores dos campos do formulário
+    const nome = document.getElementById('addNomeMontador').value;
+    const numero_registro = document.getElementById('addNumRegistroMontador').value;
+    const token = localStorage.getItem('authToken');
+
+    try {
+      // Faz o pedido POST para o endpoint que cria um novo montador
+      const response = await fetch(`${API_BASE_URL}/api/montadores`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ nome: nome, numero_registro: numero_registro })
+      });
+
+      if (!response.ok) {
+        const erro = await response.json();
+        throw new Error(erro.message || 'Erro ao adicionar montador.');
+      }
+      
+      alert('Montador adicionado com sucesso!');
+      
+      // Usa o Bootstrap para fechar o modal
+      const modalInstance = bootstrap.Modal.getInstance(addMontadorModalEl);
+      modalInstance.hide();
+
+      addMontadorForm.reset(); // Limpa o formulário
+      carregarMontadores(); // Recarrega a tabela para mostrar o novo montador!
+
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+}
