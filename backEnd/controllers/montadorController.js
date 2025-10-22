@@ -53,7 +53,6 @@ exports.getAllMontadores = async (req, res) => {
             }
         });
 
-        console.log("DADOS VINDOS DO PRISMA:", JSON.stringify(montadoresComProjetos, null, 2));
 
         // 2. Com os dados em mãos, faz a contagem em JavaScript
         const resultadoFormatado = montadoresComProjetos.map(montador => {

@@ -7,7 +7,8 @@ require('dotenv').config();
 // 1. IMPORTAÇÃO DE TODAS AS ROTAS
 const userRoutes = require('./routes/userRoutes');
 const projectRoutes = require('./routes/projectRoutes');
-const montadorRoutes = require('./routes/montadorRoutes'); // <--- GARANTA QUE ESTA LINHA EXISTE
+const montadorRoutes = require('./routes/montadorRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes'); // <-- LINHA NOVA
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -17,7 +18,7 @@ const corsOptions = {
   origin: [
     'http://localhost:5500',
     'http://127.0.0.1:5500',
-    'https://controle-producao-pied.vercel.app' // A sua URL do Vercel
+    'https://controle-producao-pied.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -30,9 +31,9 @@ app.use(express.json());
 // 2. USO DAS ROTAS COM OS PREFIXOS CORRETOS
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
-app.use('/api/montadores', montadorRoutes); // <--- GARANTA QUE ESTA LINHA EXISTE E ESTÁ CORRETA
+app.use('/api/montadores', montadorRoutes);
+app.use('/api/dashboard', dashboardRoutes); // <-- LINHA NOVA
 
-// Rota de "saúde" para testar se o servidor está no ar
 app.get('/', (req, res) => {
   res.send('API do SGP está a funcionar!');
 });
