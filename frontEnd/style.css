@@ -136,3 +136,44 @@ body {
   top: -1px; 
 }
 */
+
+/* ============================================= */
+/* MELHORIAS VISUAIS PARA SELECT MULTIPLE        */
+/* ============================================= */
+
+/* Aplica o estilo 'glass' ao select multiple */
+select[multiple].form-select-glass {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+/* Garante que as opções dentro do select tenham cor legível (pode não funcionar em todos os navegadores) */
+select[multiple].form-select-glass option {
+  background-color: #343a40; /* Cor de fundo escura para as opções */
+  color: #f8f9fa; /* Cor do texto das opções */
+  padding: 5px 10px; /* Adiciona um pouco de espaçamento interno */
+}
+
+/* Estilização da barra de rolagem (funciona melhor em navegadores baseados em WebKit - Chrome, Edge, Safari) */
+select[multiple].form-select-glass::-webkit-scrollbar {
+  width: 8px; /* Largura da barra */
+}
+
+select[multiple].form-select-glass::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1); /* Fundo da trilha da barra */
+  border-radius: 4px;
+}
+
+select[multiple].form-select-glass::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3); /* Cor do "polegar" da barra */
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Estilização da barra de rolagem para Firefox (menos opções) */
+/* Pode não funcionar tão bem quanto o WebKit */
+select[multiple].form-select-glass {
+ scrollbar-width: thin; /* 'auto', 'thin', 'none' */
+ scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1); /* Cor do polegar e da trilha */
+}
