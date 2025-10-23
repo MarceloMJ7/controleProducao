@@ -9,4 +9,11 @@ const dashboardController = require('../controllers/dashboardController');
 // URL final será: GET /api/dashboard/stats
 router.get('/stats', verificarToken, dashboardController.getStats);
 
+router.get('/atencao', verificarToken, dashboardController.getProjetosAtencao); 
+
+router.get('/atualizacoes', verificarToken, dashboardController.getUltimasAtualizacoes); 
+
+router.get('/prazos', verificarToken, dashboardController.getPrazosProximos);
+
+
 module.exports = router;

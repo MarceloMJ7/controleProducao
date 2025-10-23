@@ -27,13 +27,14 @@
                 <h1 class="h2 text-white">Gerenciar Projetos</h1>
                 <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#addProjectModal"><i class="fas fa-plus me-2"></i> Adicionar Projeto</button>
             </div>
+            
             <div class="card glass-card">
                 <div class="card-header border-bottom border-secondary border-opacity-25">
                     <div class="row g-3 align-items-center">
                         <div class="col-md-8">
                             <div class="input-group">
                                 <span class="input-group-text input-group-text-glass"><i class="fas fa-search"></i></span>
-                                <input type="text" class="form-control form-control-glass" id="filtroNome" placeholder="Buscar por nome da empresa...">
+                                <input type="text" class="form-control form-control-glass" id="filtroNome" placeholder="Buscar por código ou nome da empresa...">
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -42,19 +43,19 @@
                                 <option value="Pendente">Pendente</option>
                                 <option value="Em Montagem">Em Montagem</option>
                                 <option value="Concluído">Concluído</option>
-                            </select>
+                                </select>
                         </div>
                     </div>
-                    </div>
+                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover table-glass">
+                        <table class="table table-hover table-glass mb-0">
                             <thead>
                                 <tr>
                                     <th>Cód. Projeto</th>
                                     <th>Empresa</th>
-                                    <th>Data de Cadastro</th>
-                                    <th>Data de Entrega</th>
+                                    <th>Cadastro</th>
+                                    <th>Entrega</th>
                                     <th class="text-center">Status</th>
                                     <th class="text-end">Ações</th>
                                 </tr>
@@ -70,21 +71,18 @@
                 <div class="col-12">
                     <div class="card glass-card d-none" id="projectDetailsCard">
                         <div class="card-body">
-                            <h5 class="card-title text-white" id="projectCodeDetail"></h5>
-                            <h6 class="card-subtitle mb-3 text-white-50" id="projectCompanyDetail"></h6>
+                            <h5 class="card-title text-white" id="projectCodeDetail">Detalhes do Projeto:</h5>
+                            <h6 class="card-subtitle mb-3 text-white-50" id="projectCompanyDetail">Nome da Empresa</h6>
                             <hr class="border-secondary border-opacity-25">
                             <p class="text-white-50 mb-2">Descrição do Projeto:</p>
-                            <p class="text-white" id="projectDescriptionDetail"></p>
+                            <p class="text-white" id="projectDescriptionDetail">Carregando...</p>
                             <div class="row mt-4">
-                                <div class="col-md-3">
-                                    <p class="text-white-50 mb-1">Montador</p>
-                                    <p class="fw-bold text-white" id="projectAssemblerDetail"></p>
+                                <div class="col-md-6 col-lg-4"> <p class="text-white-50 mb-1"><strong>Montador(es):</strong></p> <p class="fw-bold text-white" id="projectAssemblerDetail">N/A</p>
                                 </div>
-                                <div class="col-md-3"> 
-                                    <p class="text-white-50 mb-1" >Status</p>
-                                    <div id="projectStatusDetail"></div>
+                                <div class="col-md-6 col-lg-4"> <p class="text-white-50 mb-1"><strong>Status:</strong></p>
+                                    <div id="projectStatusDetail"><span class="badge rounded-pill border border-secondary text-secondary">Carregando...</span></div>
                                 </div>
-                            </div>
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -104,11 +102,17 @@
                         <div class="row g-3">
                             <div class="col-md-6"><label for="nomeEmpresa" class="form-label text-white-50">Nome da Empresa</label><input id="nomeEmpresa" type="text" class="form-control form-control-glass" required></div>
                             <div class="col-md-6"><label for="codigoProjeto" class="form-label text-white-50">Código do Projeto</label><input id="codigoProjeto" type="text" class="form-control form-control-glass" required></div>
-                            <div class="col-md-6"><label for="montadorResponsavel" class="form-label text-white-50">Montador Responsável</label><select id="montadorResponsavel" class="form-select form-select-glass" required></select></div>
-                            <div class="col-md-6"><label for="statusInicial" class="form-label text-white-50">Status Inicial</label><select id="statusInicial" class="form-select form-select-glass"><option>Pendente</option><option>Em Montagem</option><option>Concluído</option></select></div>
+                            
+                            <div class="col-md-6">
+                                <label for="montadorResponsavel" class="form-label text-white-50">Montadores Responsáveis</label>
+                                <select class="form-select form-select-glass" id="montadorResponsavel" multiple style="height: 150px;">
+                                    </select>
+                                <small class="form-text text-white-50">Segure Ctrl (ou Cmd) para selecionar mais de um.</small>
+                            </div>
+                            <div class="col-md-6"><label for="statusInicial" class="form-label text-white-50">Status Inicial</label><select id="statusInicial" class="form-select form-select-glass"><option selected>Pendente</option><option>Em Montagem</option><option>Concluído</option></select></div>
                             <div class="col-md-6"><label for="dataCadastro" class="form-label text-white-50">Data de Cadastro</label><input id="dataCadastro" type="date" class="form-control form-control-glass" required></div>
-                            <div class="col-md-6"><label for="dataEntrega" class="form-label text-white-50">Data de Entrega</label><input id="dataEntrega" type="date" class="form-control form-control-glass"></div>
-                            <div class="col-12"><label for="descricao" class="form-label text-white-50">Descrição</label><textarea id="descricao" class="form-control form-control-glass" rows="2"></textarea></div>
+                            <div class="col-md-6"><label for="dataEntrega" class="form-label text-white-50">Data de Entrega (Opcional)</label><input id="dataEntrega" type="date" class="form-control form-control-glass"></div>
+                            <div class="col-12"><label for="descricao" class="form-label text-white-50">Descrição (Opcional)</label><textarea id="descricao" class="form-control form-control-glass" rows="2"></textarea></div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -128,16 +132,21 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <form id="editProjectForm">
-                    <input type="hidden" id="editProjectId">
-                    <div class="modal-body">
+                    <input type="hidden" id="editProjectId"> <div class="modal-body">
                         <div class="row g-3">
                             <div class="col-md-6"><label for="editNomeEmpresa" class="form-label text-white-50">Nome da Empresa</label><input id="editNomeEmpresa" type="text" class="form-control form-control-glass" required></div>
                             <div class="col-md-6"><label for="editCodigoProjeto" class="form-label text-white-50">Código do Projeto</label><input id="editCodigoProjeto" type="text" class="form-control form-control-glass" required></div>
-                            <div class="col-md-6"><label for="editMontadorResponsavel" class="form-label text-white-50">Montador Responsável</label><select id="editMontadorResponsavel" class="form-select form-select-glass" required></select></div>
+                            
+                            <div class="col-md-6">
+                                <label for="editMontadorResponsavel" class="form-label text-white-50">Montadores Responsáveis</label>
+                                <select class="form-select form-select-glass" id="editMontadorResponsavel" multiple style="height: 150px;">
+                                    </select>
+                                <small class="form-text text-white-50">Segure Ctrl (ou Cmd) para selecionar/desselecionar.</small>
+                            </div>
                             <div class="col-md-6"><label for="editStatus" class="form-label text-white-50">Status</label><select id="editStatus" class="form-select form-select-glass"><option>Pendente</option><option>Em Montagem</option><option>Concluído</option></select></div>
                             <div class="col-md-6"><label for="editDataCadastro" class="form-label text-white-50">Data de Cadastro</label><input id="editDataCadastro" type="date" class="form-control form-control-glass" required></div>
-                            <div class="col-md-6"><label for="editDataEntrega" class="form-label text-white-50">Data de Entrega</label><input id="editDataEntrega" type="date" class="form-control form-control-glass"></div>
-                            <div class="col-12"><label for="editDescricao" class="form-label text-white-50">Descrição</label><textarea id="editDescricao" class="form-control form-control-glass" rows="2"></textarea></div>
+                            <div class="col-md-6"><label for="editDataEntrega" class="form-label text-white-50">Data de Entrega (Opcional)</label><input id="editDataEntrega" type="date" class="form-control form-control-glass"></div>
+                            <div class="col-12"><label for="editDescricao" class="form-label text-white-50">Descrição (Opcional)</label><textarea id="editDescricao" class="form-control form-control-glass" rows="2"></textarea></div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -150,6 +159,5 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="scripts.js"></script>
-</body>
+    <script src="scripts.js"></script> </body>
 </html>

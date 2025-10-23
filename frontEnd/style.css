@@ -110,4 +110,29 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
- 
+/* ============================================= */
+/* AJUSTE DEFINITIVO ALINHAMENTO ÍCONE KPI       */
+/* ============================================= */
+
+/* Garante o comportamento flex e alinhamento central para todos os card-bodies */
+#dashboard-page .card-body.d-flex {
+  align-items: center !important; 
+}
+
+/* Ajuste fino APENAS para o ícone problemático (se necessário) 
+ usando position relative e top */
+#dashboard-page .col-lg-3:nth-child(4) .card-body i.fas { 
+  /* nth-child(4) seleciona o quarto cartão KPI */
+  position: relative;
+  /* Experimente com um valor pequeno, positivo ou negativo, até alinhar */
+  top: -2px; 
+  /* ou top: 1px; ou top: -1px; etc. */
+}
+
+/* Se preferir ajustar todos os ícones uniformemente (menos provável de ser necessário)*/
+/*
+#dashboard-page .card-body > i.fas {
+  position: relative;
+  top: -1px; 
+}
+*/
