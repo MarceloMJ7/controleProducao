@@ -146,15 +146,15 @@ exports.getUltimasAtualizacoes = async (req, res) => {
 exports.getPrazosProximos = async (req, res) => {
     const usuarioId = req.usuarioId;
     const hoje = new Date();
-    // Definir data limite (ex: próximos 30 dias). Ajuste conforme necessário.
+    // Definir data limite (ex: próximos 30 dias)
     const dataLimite = new Date();
     dataLimite.setDate(hoje.getDate() + 30);
 
-    // Ajusta 'hoje' para o início do dia para incluir entregas de hoje
+    // Ajusta 'hoje' para o início do dia
     hoje.setHours(0, 0, 0, 0);
 
     try {
-        // Busca projetos não concluídos com data de entrega definida e dentro do limite
+        // Busca projetos não concluídos com data de entrega dentro do limite
         const projetosComPrazo = await prisma.projeto.findMany({
             where: {
                 criadoPorId: usuarioId,
@@ -163,8 +163,8 @@ exports.getPrazosProximos = async (req, res) => {
                 },
                 data_entrega: {
                     gte: hoje,         // Maior ou igual a hoje (início do dia)
-                    lte: dataLimite,   // Menor ou igual à data limite
-                    not: null          // Garante que a data de entrega não é nula
+                    lte: dataLimite    // Menor ou igual à data limite
+                    // *** Linha "not: null" REMOVIDA daqui ***
                 }
             },
             select: { // Seleciona campos para a tabela

@@ -5,14 +5,13 @@ const prisma = new PrismaClient();
 
 // --- CRIAR PROJETO (ATUALIZADO) ---
 exports.createProject = async (req, res) => {
-    // Pega os dados do corpo da requisição
-    // Espera 'montadorIds' como um array de números [1, 2, ...] ou vazio/null
+    // data_entrega agora é obrigatória
     const { codigo_projeto, nome_empresa, status, descricao, data_cadastro, data_entrega, montadorIds } = req.body;
-    const criadoPorId = req.usuarioId; // ID do usuário logado (do middleware)
+    const criadoPorId = req.usuarioId; 
 
-    // Validação básica
-    if (!codigo_projeto || !nome_empresa || !status || !data_cadastro) {
-        return res.status(400).json({ message: "Campos obrigatórios ausentes (código, nome da empresa, status, data de cadastro)." });
+    // *** ALTERAÇÃO AQUI: Adicionada validação para data_entrega ***
+    if (!codigo_projeto || !nome_empresa || !status || !data_cadastro || !data_entrega) {
+        return res.status(400).json({ message: "Campos obrigatórios ausentes (código, nome da empresa, status, data de cadastro, data de entrega)." });
     }
 
     try {
@@ -22,37 +21,88 @@ exports.createProject = async (req, res) => {
             nome_empresa,
             status,
             descricao,
-            data_cadastro: new Date(data_cadastro), // Garante que é um objeto Date
-            data_entrega: data_entrega ? new Date(data_entrega) : null,
-            criadoPorId, // Associa ao usuário logado
-            montadores: {} // Objeto para conectar os montadores
+            data_cadastro: new Date(data_cadastro),
+            data_entrega: new Date(data_entrega), // Agora é sempre uma data válida
+            criadoPorId, 
+            montadores: {} 
         };
 
-        // --- LÓGICA PARA CONECTAR MONTADORES ---
         if (montadorIds && Array.isArray(montadorIds) && montadorIds.length > 0) {
-            // Filtra para garantir que são apenas números válidos
             const validIds = montadorIds.map(id => parseInt(id)).filter(id => !isNaN(id));
             if (validIds.length > 0) {
-                 // Usa a sintaxe 'connect' do Prisma para criar as ligações N-M
                 data.montadores = {
-                    connect: validIds.map(id => ({ id: id })) // Formato: [{id: 1}, {id: 2}, ...]
+                    connect: validIds.map(id => ({ id: id }))
                 };
             }
         }
-        // Se montadorIds for vazio ou inválido, não conecta nenhum montador
 
-        // Cria o projeto no banco de dados
         const novoProjeto = await prisma.projeto.create({ data: data });
-
-        res.status(201).json(novoProjeto); // Retorna o projeto criado
+        res.status(201).json(novoProjeto);
 
     } catch (error) {
         console.error("Erro ao criar projeto:", error);
-        // Verifica erro de código de projeto duplicado (se @unique foi adicionado)
         if (error.code === 'P2002' && error.meta?.target?.includes('codigo_projeto')) {
              return res.status(409).json({ message: "Código do projeto já existe." });
         }
         res.status(500).json({ message: "Erro interno ao criar projeto." });
+    }
+};
+
+// --- ATUALIZAR PROJETO (ATUALIZADO) ---
+exports.updateProject = async (req, res) => {
+    const { id } = req.params;
+    // data_entrega agora é obrigatória
+    const { codigo_projeto, nome_empresa, status, descricao, data_cadastro, data_entrega, montadorIds } = req.body;
+    const usuarioId = req.usuarioId;
+
+    // *** ALTERAÇÃO AQUI: Validação de data_entrega adicionada ***
+    if (!data_entrega) {
+         return res.status(400).json({ message: "O campo data de entrega é obrigatório." });
+    }
+    // (Outras validações podem ser adicionadas se necessário)
+
+    try {
+        const projetoExistente = await prisma.projeto.findUnique({
+            where: { id: parseInt(id) }
+        });
+        if (!projetoExistente || projetoExistente.criadoPorId !== usuarioId) {
+            return res.status(404).json({ message: "Projeto não encontrado ou não autorizado." });
+        }
+
+        const data = {
+            codigo_projeto,
+            nome_empresa,
+            status,
+            descricao,
+            data_cadastro: data_cadastro ? new Date(data_cadastro) : undefined,
+            data_entrega: new Date(data_entrega), // Agora é obrigatório e convertido para Date
+            montadores: {}
+        };
+
+        let connectMontadores = [];
+        if (montadorIds && Array.isArray(montadorIds) && montadorIds.length > 0) {
+            const validIds = montadorIds.map(id => parseInt(id)).filter(id => !isNaN(id));
+            if (validIds.length > 0) {
+                connectMontadores = validIds.map(id => ({ id: id }));
+            }
+        }
+        data.montadores = {
+            set: connectMontadores
+        };
+
+        const projetoAtualizado = await prisma.projeto.update({
+            where: { id: parseInt(id) },
+            data: data
+        });
+
+        res.status(200).json(projetoAtualizado);
+
+    } catch (error) {
+        console.error("Erro ao atualizar projeto:", error);
+        if (error.code === 'P2002' && error.meta?.target?.includes('codigo_projeto')) {
+             return res.status(409).json({ message: "Código do projeto já existe." });
+        }
+        res.status(500).json({ message: "Erro interno ao atualizar projeto." });
     }
 };
 

@@ -39,7 +39,9 @@ model Projeto {
   status          String
   descricao       String?
   data_cadastro   DateTime  @default(now())
-  data_entrega    DateTime?
+  
+  // --- ALTERAÇÃO APLICADA AQUI ---
+  data_entrega    DateTime  // Removido o '?' para tornar o campo obrigatório
 
   // Relação com o usuário criador (Obrigatória)
   criadoPorId     Int
@@ -51,7 +53,6 @@ model Projeto {
   // Campo de data de atualização (recomendado)
   updatedAt       DateTime  @default(now()) @updatedAt
 
-  // *** NOVOS CAMPOS ADICIONADOS AQUI ***
   // Campos para Não Conformidade
   teveNaoConformidade     Boolean  @default(false) // Começa como falso
   descricaoNaoConformidade String?                 // Opcional para descrever
