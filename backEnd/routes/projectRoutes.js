@@ -19,6 +19,9 @@ router.get("/:id", verificarToken, projectController.getProjectById);
 // Rota para atualizar um projeto (PUT /api/projects/123)
 router.put("/:id", verificarToken, projectController.updateProject);
 
+// --- NOVA ROTA PARA NÃO CONFORMIDADE ---
+router.put('/:id/naoconformidade', verificarToken, projectController.marcarNaoConformidade);
+
 // Rota para deletar um projeto (DELETE /api/projects/123)
 router.delete("/:id", verificarToken, projectController.deleteProject);
 

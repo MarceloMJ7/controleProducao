@@ -4,49 +4,61 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 exports.getStats = async (req, res) => {
-    // Pega o ID do usuário logado, que o middleware de autenticação nos fornece
-    const usuarioId = req.usuarioId;
+    const usuarioId = req.usuarioId; // ID do usuário logado
+
+    // Obter o primeiro e último dia do mês atual
+    const agora = new Date();
+    const primeiroDiaMes = new Date(agora.getFullYear(), agora.getMonth(), 1);
+    const ultimoDiaMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0); // O dia 0 do próximo mês é o último dia do mês atual
+    // Ajustar o último dia para o final do dia (23:59:59.999) para incluir tudo
+    ultimoDiaMes.setHours(23, 59, 59, 999);
+
 
     try {
-        // Usamos Promise.all para executar todas as contagens em paralelo, o que é muito mais rápido
+        // Usar Promise.all para executar as contagens em paralelo
         const [
-            totalProjetos,
+            // Contagem de projetos por status (como antes)
             projetosPorStatus,
-            totalMontadores
+            // NOVA Contagem: Projetos cadastrados no mês atual
+            projetosCadastradosMes
         ] = await Promise.all([
-            // Conta todos os projetos criados pelo usuário logado
-            prisma.projeto.count({ where: { criadoPorId: usuarioId } }),
-
             // Agrupa e conta os projetos por status
             prisma.projeto.groupBy({
                 by: ['status'],
                 where: { criadoPorId: usuarioId },
-                _count: {
-                    status: true
-                }
+                _count: { status: true }
             }),
-
-            // Conta todos os montadores (geralmente eles são para toda a empresa)
-            prisma.montador.count()
+            // Conta projetos criados entre o primeiro e último dia do mês atual
+            prisma.projeto.count({
+                where: {
+                    criadoPorId: usuarioId,
+                    data_cadastro: {
+                        gte: primeiroDiaMes, // Maior ou igual ao primeiro dia
+                        lte: ultimoDiaMes    // Menor ou igual ao último dia (com hora ajustada)
+                    }
+                }
+            })
+            // REMOVEMOS a contagem de prisma.montador.count() daqui
         ]);
 
-        // Formata os dados para ser fácil de usar no front-end
+        // Formata os dados para a resposta da API
         const stats = {
-            totalProjetos: totalProjetos,
-            totalMontadores: totalMontadores,
+            // totalProjetos: // Removido por simplicidade, mas pode ser adicionado se necessário
+            projetosMes: projetosCadastradosMes, // NOVA métrica
             pendentes: 0,
             emMontagem: 0,
             concluidos: 0
+            // totalMontadores: // REMOVIDO
         };
 
+        // Preenche as contagens por status
         projetosPorStatus.forEach(item => {
             if (item.status === 'Pendente') stats.pendentes = item._count.status;
             if (item.status === 'Em Montagem') stats.emMontagem = item._count.status;
             if (item.status === 'Concluído') stats.concluidos = item._count.status;
         });
 
-        // Retorna um único objeto JSON com todos os resultados
-        res.status(200).json(stats);
+        res.status(200).json(stats); // Retorna o objeto JSON com as estatísticas atualizadas
 
     } catch (error) {
         console.error("Erro ao buscar estatísticas do dashboard:", error);

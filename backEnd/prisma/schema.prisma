@@ -18,7 +18,7 @@ model Usuario {
   senha           String
 
   // Relação: Um usuário pode criar muitos projetos
-  projetos        Projeto[] @relation("CriadoPor") 
+  projetos        Projeto[] @relation("CriadoPor")
 }
 
 // Modelo para os montadores
@@ -28,17 +28,17 @@ model Montador {
   numero_registro String    @unique
 
   // Relação Muitos-para-Muitos: Um montador pode estar em muitos projetos
-  projetos        Projeto[] @relation("ProjetoMontadores") 
+  projetos        Projeto[] @relation("ProjetoMontadores")
 }
 
 // Modelo para os projetos
 model Projeto {
   id              Int       @id @default(autoincrement())
-  codigo_projeto  String    @unique 
+  codigo_projeto  String    @unique
   nome_empresa    String
   status          String
   descricao       String?
-  data_cadastro   DateTime  @default(now()) 
+  data_cadastro   DateTime  @default(now())
   data_entrega    DateTime?
 
   // Relação com o usuário criador (Obrigatória)
@@ -48,7 +48,11 @@ model Projeto {
   // Relação Muitos-para-Muitos: Um projeto pode ter muitos montadores
   montadores      Montador[] @relation("ProjetoMontadores")
 
-  // --- CORREÇÃO APLICADA AQUI ---
-  // Campo de data de atualização com valor padrão para migração
-  updatedAt       DateTime  @default(now()) @updatedAt 
+  // Campo de data de atualização (recomendado)
+  updatedAt       DateTime  @default(now()) @updatedAt
+
+  // *** NOVOS CAMPOS ADICIONADOS AQUI ***
+  // Campos para Não Conformidade
+  teveNaoConformidade     Boolean  @default(false) // Começa como falso
+  descricaoNaoConformidade String?                 // Opcional para descrever
 }

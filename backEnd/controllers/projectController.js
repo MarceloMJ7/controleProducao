@@ -133,7 +133,6 @@ exports.getAllProjects = async (req, res) => {
             where.OR = [
                 { nome_empresa: { contains: nome, mode: 'insensitive' } },
                 { codigo_projeto: { contains: nome, mode: 'insensitive' } }
-                // { descricao: { contains: nome, mode: 'insensitive' } } // Se quiser buscar na descrição também
             ];
         }
 
@@ -143,16 +142,29 @@ exports.getAllProjects = async (req, res) => {
 
         const projetos = await prisma.projeto.findMany({
             where: where,
-            // --- ALTERAÇÃO AQUI ---
-            // Inclui a LISTA de montadores associados
-            include: {
-                montadores: { // Nome da relação definida no schema
-                    select: { // Seleciona apenas id e nome dos montadores
+            // Seleciona os campos necessários E os novos campos de não conformidade
+            select: {
+                id: true,
+                codigo_projeto: true,
+                nome_empresa: true,
+                status: true,
+                descricao: true,
+                data_cadastro: true,
+                data_entrega: true,
+                criadoPorId: true, // Necessário para include
+                teveNaoConformidade: true,      // <-- ADICIONADO
+                descricaoNaoConformidade: true, // <-- ADICIONADO
+                montadores: { // Incluindo montadores dentro do select
+                    select: {
                         id: true,
                         nome: true
                     }
                 }
             },
+            // Se você usava include antes, pode manter, mas select é mais explícito
+            // include: {
+            //     montadores: { select: { id: true, nome: true } }
+            // },
             orderBy: {
                 data_cadastro: 'desc'
             }
@@ -228,5 +240,60 @@ exports.deleteProject = async (req, res) => {
     } catch (error) {
         console.error("Erro ao deletar projeto:", error);
         res.status(500).json({ message: "Erro interno ao deletar projeto." });
+    }
+};
+
+exports.marcarNaoConformidade = async (req, res) => {
+    const { id } = req.params; // ID do projeto da URL
+    const { teveNaoConformidade, descricaoNaoConformidade } = req.body; // Dados do corpo da requisição
+    const usuarioId = req.usuarioId; // ID do usuário logado
+
+    // Validação básica de entrada
+    if (typeof teveNaoConformidade !== 'boolean') {
+        return res.status(400).json({ message: "O campo 'teveNaoConformidade' deve ser true ou false." });
+    }
+    // Se marcou como não conforme, a descrição pode ser opcional mas não deve ser vazia se enviada
+    // Se desmarcou, limpamos a descrição
+    const descFinal = teveNaoConformidade ? (descricaoNaoConformidade || null) : null;
+
+
+    try {
+        // Busca o projeto para verificar permissão e status (opcionalmente)
+        const projeto = await prisma.projeto.findUnique({
+            where: { id: parseInt(id) },
+            select: { criadoPorId: true, status: true } // Seleciona só o necessário
+        });
+
+        if (!projeto || projeto.criadoPorId !== usuarioId) {
+            return res.status(404).json({ message: "Projeto não encontrado ou não autorizado." });
+        }
+
+       
+        if (projeto.status !== 'Concluído' && teveNaoConformidade === true) {
+             return res.status(400).json({ message: "Só é possível marcar não conformidade em projetos já concluídos." });
+        }
+    
+
+        // Atualiza apenas os campos de não conformidade
+        const projetoAtualizado = await prisma.projeto.update({
+            where: { id: parseInt(id) },
+            data: {
+                teveNaoConformidade: teveNaoConformidade,
+                descricaoNaoConformidade: descFinal
+            }
+        });
+
+        res.status(200).json({
+             message: "Status de não conformidade atualizado.",
+             projeto: { // Retorna só os campos relevantes para confirmação
+                 id: projetoAtualizado.id,
+                 teveNaoConformidade: projetoAtualizado.teveNaoConformidade,
+                 descricaoNaoConformidade: projetoAtualizado.descricaoNaoConformidade
+             }
+         });
+
+    } catch (error) {
+        console.error("Erro ao marcar não conformidade:", error);
+        res.status(500).json({ message: "Erro interno ao atualizar não conformidade." });
     }
 };

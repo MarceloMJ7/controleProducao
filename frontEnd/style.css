@@ -10,7 +10,7 @@ body {
   
   /* --- Layout da Sidebar --- */
   .sidebar {
-    width: 280px;
+    width: 265px;
     background-color: #212529 !important;
   }
   
@@ -166,7 +166,7 @@ select[multiple].form-select-glass::-webkit-scrollbar-track {
 }
 
 select[multiple].form-select-glass::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3); /* Cor do "polegar" da barra */
+  background-color: rgba(246, 245, 245, 0.826); /* Cor do "polegar" da barra */
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
