@@ -3,177 +3,234 @@
 /* ============================================= */
 
 body {
-    background: linear-gradient(135deg, #212529, #495057);
-    background-attachment: fixed;
-    min-height: 100vh;
-  }
-  
-  /* --- Layout da Sidebar --- */
-  .sidebar {
-    width: 265px;
-    background-color: #212529 !important;
-  }
-  
-  .main-content {
-    flex-grow: 1;
-    height: 100vh;
-    overflow-y: auto;
-  }
-  
-  /* --- Estilos da Navegação na Sidebar --- */
-  .nav-pills .nav-link {
-    color: rgba(255, 255, 255, 0.75);
-  }
-  
-  .nav-pills .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
-  }
-  
-  .nav-pills .nav-link.active {
-    background-color: #0d6efd; /* Azul Padrão Bootstrap */
-    color: #fff;
-  }
-  
-  /* --- Componente Principal: Cartão de Vidro --- */
-  .glass-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* ============================================= */
-  /* CORREÇÃO PARA LISTAS E TABELAS                */
-  /* ============================================= */
-  
-  /* Regra mais específica para itens de lista dentro de um card de vidro */
-  .glass-card .list-group-item {
-      background-color: transparent !important;
-      border-color: rgba(255, 255, 255, 0.15) !important;
-      color: #f8f9fa;
-  }
-  
-  .table-glass {
-    color: #f8f9fa;
-  }
-  
-  .table-glass th, .table-glass td {
-    color: #f8f9fa;
-    border-color: rgba(255, 255, 255, 0.15);
-    background-color: transparent !important; 
-  }
-  
-  .table-glass tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    cursor: pointer;
-  }
-  
-  /* --- Estilos para Formulários no Tema de Vidro --- */
-  .form-control-glass, .form-select-glass {
-    background-color: rgba(0, 0, 0, 0.2) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    color: #fff !important;
-  }
-  
-  .form-control-glass::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-  }
-  
-  .input-group-text-glass {
-    background-color: rgba(0, 0, 0, 0.2) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    color: rgba(255, 255, 255, 0.6) !important;
-  }
-  
-  .form-select-glass {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-  }
-  
-  /* --- Estilos para o Modal de Vidro --- */
-  .modal-glass {
-    background: rgba(33, 37, 41, 0.6);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-  }
-  
-  .modal-glass .modal-content {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .modal-glass .modal-header, .modal-glass .modal-footer {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
+  /* Fundo ATUALIZADO para um gradiente mais escuro e azulado */
+  background: linear-gradient(135deg, rgba(16, 19, 36, 1) 0%, rgba(32, 36, 63, 1) 50%, rgba(16, 19, 36, 1) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: #f8f9fa; /* Define a cor do texto padrão como clara */
+}
+
+/* --- Layout da Sidebar --- */
+.sidebar {
+  width: 265px;
+  background-color: #212529 !important; /* Mantém a sidebar escura */
+}
+
+.main-content {
+  flex-grow: 1;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* --- Estilos da Navegação na Sidebar --- */
+.nav-pills .nav-link {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.nav-pills .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.nav-pills .nav-link.active {
+  background-color: #0d6efd; /* Azul Padrão Bootstrap */
+  color: #fff;
+}
+
+/* --- Componente Principal: Cartão de Vidro (Dashboard/Páginas) --- */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================= */
+/* CORREÇÃO PARA LISTAS E TABELAS                */
+/* ============================================= */
+
+.glass-card .list-group-item {
+     background-color: transparent !important;
+     border-color: rgba(255, 255, 255, 0.15) !important;
+     color: #f8f9fa;
+ }
+
+.table-glass {
+  color: #f8f9fa;
+}
+
+.table-glass th, .table-glass td {
+  color: #f8f9fa;
+  border-color: rgba(255, 255, 255, 0.15);
+  background-color: transparent !important; 
+}
+
+.table-glass tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  cursor: pointer;
+}
+
+/* --- Estilos para Formulários no Tema de Vidro (PARA O DASHBOARD) --- */
+/* Estes ainda são necessários para as outras páginas */
+.form-control-glass, .form-select-glass {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+.form-control-glass::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.input-group-text-glass {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.form-select-glass {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+/* --- Estilos para o Modal de Vidro --- */
+.modal-glass {
+  background: rgba(33, 37, 41, 0.6);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.modal-glass .modal-content {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-glass .modal-header, .modal-glass .modal-footer {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
 
 /* ============================================= */
 /* AJUSTE DEFINITIVO ALINHAMENTO ÍCONE KPI       */
 /* ============================================= */
 
-/* Garante o comportamento flex e alinhamento central para todos os card-bodies */
 #dashboard-page .card-body.d-flex {
   align-items: center !important; 
 }
 
-/* Ajuste fino APENAS para o ícone problemático (se necessário) 
- usando position relative e top */
 #dashboard-page .col-lg-3:nth-child(4) .card-body i.fas { 
-  /* nth-child(4) seleciona o quarto cartão KPI */
   position: relative;
-  /* Experimente com um valor pequeno, positivo ou negativo, até alinhar */
   top: -2px; 
-  /* ou top: 1px; ou top: -1px; etc. */
 }
-
-/* Se preferir ajustar todos os ícones uniformemente (menos provável de ser necessário)*/
-/*
-#dashboard-page .card-body > i.fas {
-  position: relative;
-  top: -1px; 
-}
-*/
 
 /* ============================================= */
 /* MELHORIAS VISUAIS PARA SELECT MULTIPLE        */
 /* ============================================= */
 
-/* Aplica o estilo 'glass' ao select multiple */
 select[multiple].form-select-glass {
   background-color: rgba(0, 0, 0, 0.2) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: #fff !important;
 }
 
-/* Garante que as opções dentro do select tenham cor legível (pode não funcionar em todos os navegadores) */
 select[multiple].form-select-glass option {
-  background-color: #343a40; /* Cor de fundo escura para as opções */
-  color: #f8f9fa; /* Cor do texto das opções */
-  padding: 5px 10px; /* Adiciona um pouco de espaçamento interno */
+  background-color: #343a40;
+  color: #f8f9fa;
+  padding: 5px 10px;
 }
 
-/* Estilização da barra de rolagem (funciona melhor em navegadores baseados em WebKit - Chrome, Edge, Safari) */
 select[multiple].form-select-glass::-webkit-scrollbar {
-  width: 8px; /* Largura da barra */
+  width: 8px;
 }
 
 select[multiple].form-select-glass::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1); /* Fundo da trilha da barra */
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 4px;
 }
 
 select[multiple].form-select-glass::-webkit-scrollbar-thumb {
-  background-color: rgba(246, 245, 245, 0.826); /* Cor do "polegar" da barra */
+  background-color: rgba(246, 245, 245, 0.826);
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Estilização da barra de rolagem para Firefox (menos opções) */
-/* Pode não funcionar tão bem quanto o WebKit */
 select[multiple].form-select-glass {
- scrollbar-width: thin; /* 'auto', 'thin', 'none' */
- scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1); /* Cor do polegar e da trilha */
+   scrollbar-width: thin;
+   scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================= */
+/* ESTILOS DA PÁGINA DE LOGIN (SEU NOVO CÓDIGO)  */
+/* ============================================= */
+
+/* Define o fundo e centraliza o conteúdo */
+body.login-page {
+    /* Garante que o gradiente escuro do body principal se aplique */
+    background: linear-gradient(135deg, rgba(16, 19, 36, 1) 0%, rgba(32, 36, 63, 1) 50%, rgba(16, 19, 36, 1) 100%);
+    background-attachment: fixed;
+    
+    /* Centraliza o card de login */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh; /* Garante altura total */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Define o tamanho do container do formulário */
+.login-container {
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
+}
+
+/* Estilo "Glass" específico para o card de login/cadastro */
+.glass-card-login {
+    background: rgba(255, 255, 255, 0.05); /* Mais translúcido */
+    backdrop-filter: blur(15px); /* Mais blur */
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Borda mais clara */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Sombra mais forte */
+    color: #fff; /* Texto padrão branco */
+}
+
+/* Cor do texto do placeholder (label flutuante) e ícones */
+.login-container .form-floating > label,
+.login-container .fas,
+.login-container .text-white-50 { /* Torna o texto "Sistema de Gestão" mais claro */
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Cor do texto do título */
+.login-container .text-white {
+    color: #fff !important;
+}
+
+/* Cor dos links "Esqueceu a senha / Criar conta" */
+.login-container a {
+    color: rgba(255, 255, 255, 0.75) !important;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.login-container a:hover {
+    color: #fff !important;
+    text-decoration: underline;
+}
+
+/* ============================================= */
+/* AJUSTE PARA LABELS FLUTUANTES EM FUNDO BRANCO */
+/* ============================================= */
+
+/* Esta é a correção para os inputs brancos que estamos usando 
+   na tela de login. */
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: #6c757d; /* Cor do label quando encolhido */
+}
+
+.form-floating > label {
+    color: #6c757d; /* Cor do label quando expandido */
 }

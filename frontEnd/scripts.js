@@ -19,47 +19,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // --- Lógica de Inicialização do Dashboard ---
   if (document.getElementById('dashboard-page')) {
-    carregarEstatisticasDashboard(); // Carrega KPIs
-    carregarProjetosAtencao(); // Carrega lista de projetos com atenção
-    carregarUltimasAtualizacoes(); // Carrega lista de atualizações recentes
-    carregarPrazosProximos(); // Carrega tabela de prazos
+      carregarEstatisticasDashboard(); // Carrega KPIs
+      carregarProjetosAtencao(); // Carrega lista de projetos com atenção
+      carregarUltimasAtualizacoes(); // Carrega lista de atualizações recentes
+      carregarPrazosProximos(); // Carrega tabela de prazos
   }
 
   // --- Listener GERAL para botões "Ver Projeto" (originados do Dashboard) ---
-  document.body.addEventListener('click', function (event) {
-    const verButton = event.target.closest('.btn-ver-projeto');
-    if (verButton) {
-      event.preventDefault();
-      const codigoProjeto = verButton.dataset.projetoCodigo;
-      if (codigoProjeto) {
-        window.location.href = `gerenciador_Projetos.html?codigo=${encodeURIComponent(codigoProjeto)}`;
+  document.body.addEventListener('click', function(event) {
+      const verButton = event.target.closest('.btn-ver-projeto');
+      if (verButton) {
+          event.preventDefault();
+          const codigoProjeto = verButton.dataset.projetoCodigo;
+          if (codigoProjeto) {
+              window.location.href = `gerenciador_Projetos.html?codigo=${encodeURIComponent(codigoProjeto)}`;
+          }
       }
-    }
   });
 
-  // --- Lógica Específica do Modal Não Conformidade ---
-  // (Movemos o listener da tabela para dentro do "if (tabelaProjetosCorpo)"
-  // mas mantemos os listeners do modal aqui, pois o modal existe no HTML desde o início)
-  const naoConformidadeModalEl = document.getElementById('naoConformidadeModal');
-  if (naoConformidadeModalEl) {
-    const checkbox = document.getElementById('naoConformidadeCheckbox');
-    const descricaoDiv = document.getElementById('naoConformidadeDescricaoDiv');
-    const form = document.getElementById('naoConformidadeForm');
-
-    // Mostrar/ocultar descrição ao mudar o checkbox
-    checkbox.addEventListener('change', function () {
-      descricaoDiv.style.display = this.checked ? 'block' : 'none';
-      if (!this.checked) {
-        // Limpa a descrição se desmarcar
-        document.getElementById('naoConformidadeDescricao').value = '';
-      }
-    });
-
-    // Salvar ao submeter o formulário
-    // Nota: A função 'salvarNaoConformidade' agora precisa ser global ou definida antes daqui.
-    // Vamos movê-la para fora do 'if (tabelaProjetosCorpo)' para torná-la global.
-    form.addEventListener('submit', salvarNaoConformidade);
+  // --- LÓGICA DE LOGOUT (Funciona em todas as páginas) ---
+  const logoutButton = document.getElementById('logoutButton');
+  if (logoutButton) {
+      logoutButton.addEventListener('click', function(event) {
+          event.preventDefault(); // Impede a navegação padrão do link '#'
+          localStorage.removeItem('authToken'); // Limpa o token
+          alert('Logout realizado com sucesso!');
+          window.location.href = 'login.html'; // Redireciona para login
+      });
   }
+  // (Listeners da página de Projetos movidos para dentro do 'if (tabelaProjetosCorpo)' para corrigir o escopo)
 
 }); // Fim do DOMContentLoaded principal
 
@@ -88,99 +76,99 @@ async function carregarDadosUsuario() {
 /* LÓGICA DA TELA DE DASHBOARD                     */
 /* ============================================= */
 async function carregarEstatisticasDashboard() {
-  const token = localStorage.getItem("authToken"); if (!token) return;
-  const idsDosCards = ['statsProjetosAtivos', 'statsProjetosPendentes', 'statsProjetosConcluidos', 'statsProjetosMes'];
-  idsDosCards.forEach(id => {
-    const elemento = document.getElementById(id);
-    if (elemento) { elemento.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span>`; }
-    else { console.warn(`Elemento com ID '${id}' não encontrado (spinner).`); }
-  });
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/dashboard/stats`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-cache' });
-    if (!response.ok) { throw new Error('Falha ao buscar estatísticas do dashboard.'); }
-    const stats = await response.json();
-    const statsMap = {
-      'statsProjetosAtivos': stats.emMontagem, 'statsProjetosPendentes': stats.pendentes,
-      'statsProjetosConcluidos': stats.concluidos, 'statsProjetosMes': stats.projetosMes
-    };
+    const token = localStorage.getItem("authToken"); if (!token) return;
+    const idsDosCards = ['statsProjetosAtivos', 'statsProjetosPendentes', 'statsProjetosConcluidos', 'statsProjetosMes'];
     idsDosCards.forEach(id => {
-      const elemento = document.getElementById(id);
-      if (elemento) { elemento.textContent = statsMap[id] !== undefined && statsMap[id] !== null ? statsMap[id] : 0; }
-      else { console.warn(`Elemento com ID '${id}' não encontrado (valor).`); }
+        const elemento = document.getElementById(id);
+        if (elemento) { elemento.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span>`; }
+        else { console.warn(`Elemento com ID '${id}' não encontrado (spinner).`); }
     });
-  } catch (error) {
-    console.error("Erro ao carregar estatísticas:", error.message);
-    idsDosCards.forEach(id => { const elemento = document.getElementById(id); if (elemento) elemento.textContent = '!'; });
-  }
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/stats`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-cache' });
+        if (!response.ok) { throw new Error('Falha ao buscar estatísticas do dashboard.'); }
+        const stats = await response.json();
+        const statsMap = {
+            'statsProjetosAtivos': stats.emMontagem, 'statsProjetosPendentes': stats.pendentes,
+            'statsProjetosConcluidos': stats.concluidos, 'statsProjetosMes': stats.projetosMes
+        };
+        idsDosCards.forEach(id => {
+            const elemento = document.getElementById(id);
+            if (elemento) { elemento.textContent = statsMap[id] !== undefined && statsMap[id] !== null ? statsMap[id] : 0; }
+            else { console.warn(`Elemento com ID '${id}' não encontrado (valor).`); }
+        });
+    } catch (error) {
+        console.error("Erro ao carregar estatísticas:", error.message);
+        idsDosCards.forEach(id => { const elemento = document.getElementById(id); if (elemento) elemento.textContent = '!'; });
+    }
 }
 async function carregarProjetosAtencao() {
-  const token = localStorage.getItem("authToken"); if (!token) return;
-  const listaElement = document.getElementById('listaProjetosAtencao'); if (!listaElement) return;
-  listaElement.innerHTML = '<li class="list-group-item text-center text-white-50"><span class="spinner-border spinner-border-sm" role="status"></span> Carregando...</li>';
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/dashboard/atencao`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-cache' });
-    if (!response.ok) { throw new Error('Falha ao buscar projetos que exigem atenção.'); }
-    const projetos = await response.json(); listaElement.innerHTML = '';
-    if (projetos.length === 0) { listaElement.innerHTML = '<li class="list-group-item text-center text-white-50">Nenhum projeto requer atenção especial no momento.</li>'; return; }
-    projetos.forEach(projeto => {
-      let badgeClass = 'text-bg-secondary'; let motivo = projeto.descricao || 'Sem detalhes adicionais.';
-      if (projeto.tipo_atencao === 'Atrasado') { badgeClass = 'text-bg-danger'; motivo = `Prazo expirou em ${new Date(projeto.data_entrega).toLocaleDateString('pt-BR')}.`; }
-      const itemHTML = `<li class="list-group-item d-flex justify-content-between align-items-start"> <div> <span class="badge ${badgeClass}">${projeto.tipo_atencao}</span> <strong class="ms-2">${projeto.codigo_projeto} - ${projeto.nome_empresa}</strong> <small class="d-block text-white-50 ms-2">${motivo}</small> </div> <a href="#" class="btn btn-sm btn-outline-light mt-1 btn-ver-projeto" data-projeto-codigo="${projeto.codigo_projeto}">Ver</a> </li>`;
-      listaElement.innerHTML += itemHTML;
-    });
-  } catch (error) { console.error("Erro ao carregar projetos com atenção:", error.message); listaElement.innerHTML = '<li class="list-group-item text-center text-danger">Erro ao carregar projetos.</li>'; }
+    const token = localStorage.getItem("authToken"); if (!token) return;
+    const listaElement = document.getElementById('listaProjetosAtencao'); if (!listaElement) return;
+    listaElement.innerHTML = '<li class="list-group-item text-center text-white-50"><span class="spinner-border spinner-border-sm" role="status"></span> Carregando...</li>';
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/atencao`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-cache' });
+        if (!response.ok) { throw new Error('Falha ao buscar projetos que exigem atenção.'); }
+        const projetos = await response.json(); listaElement.innerHTML = '';
+        if (projetos.length === 0) { listaElement.innerHTML = '<li class="list-group-item text-center text-white-50">Nenhum projeto requer atenção especial no momento.</li>'; return; }
+        projetos.forEach(projeto => {
+            let badgeClass = 'text-bg-secondary'; let motivo = projeto.descricao || 'Sem detalhes adicionais.';
+            if (projeto.tipo_atencao === 'Atrasado') { badgeClass = 'text-bg-danger'; motivo = `Prazo expirou em ${new Date(projeto.data_entrega).toLocaleDateString('pt-BR')}.`; }
+            const itemHTML = `<li class="list-group-item d-flex justify-content-between align-items-start"> <div> <span class="badge ${badgeClass}">${projeto.tipo_atencao}</span> <strong class="ms-2">${projeto.codigo_projeto} - ${projeto.nome_empresa}</strong> <small class="d-block text-white-50 ms-2">${motivo}</small> </div> <a href="#" class="btn btn-sm btn-outline-light mt-1 btn-ver-projeto" data-projeto-codigo="${projeto.codigo_projeto}">Ver</a> </li>`;
+            listaElement.innerHTML += itemHTML;
+        });
+    } catch (error) { console.error("Erro ao carregar projetos com atenção:", error.message); listaElement.innerHTML = '<li class="list-group-item text-center text-danger">Erro ao carregar projetos.</li>'; }
 }
 async function carregarUltimasAtualizacoes() {
-  const token = localStorage.getItem("authToken"); if (!token) return;
-  const listaElement = document.getElementById('listaUltimasAtualizacoes'); if (!listaElement) return;
-  listaElement.innerHTML = '<li class="list-group-item text-center text-white-50"><span class="spinner-border spinner-border-sm" role="status"></span> Carregando...</li>';
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/dashboard/atualizacoes`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-cache' });
-    if (!response.ok) { throw new Error('Falha ao buscar últimas atualizações.'); }
-    const projetosRecentes = await response.json(); listaElement.innerHTML = '';
-    if (projetosRecentes.length === 0) { listaElement.innerHTML = '<li class="list-group-item text-center text-white-50">Nenhuma atualização recente.</li>'; return; }
-    projetosRecentes.forEach(projeto => {
-      let badgeClass = 'text-bg-secondary'; let actionText = 'Cadastrado';
-      switch (projeto.status) {
-        case 'Concluído': badgeClass = 'text-bg-success'; actionText = 'Concluído'; break;
-        case 'Em Montagem': badgeClass = 'text-bg-primary'; actionText = 'Iniciado'; break;
-        case 'Pendente': badgeClass = 'text-bg-warning'; actionText = 'Pendente'; break;
-      }
-      const tempoAtras = calcularTempoAtras(projeto.data_cadastro);
-      const itemHTML = `<li class="list-group-item"> <span class="badge ${badgeClass}">${actionText}</span> <strong class="ms-2">${projeto.codigo_projeto} - ${projeto.nome_empresa}</strong> <small class="text-white-50 d-block">${tempoAtras}</small> </li>`;
-      listaElement.innerHTML += itemHTML;
-    });
-  } catch (error) { console.error("Erro ao carregar últimas atualizações:", error.message); listaElement.innerHTML = '<li class="list-group-item text-center text-danger">Erro ao carregar atualizações.</li>'; }
+    const token = localStorage.getItem("authToken"); if (!token) return;
+    const listaElement = document.getElementById('listaUltimasAtualizacoes'); if (!listaElement) return;
+    listaElement.innerHTML = '<li class="list-group-item text-center text-white-50"><span class="spinner-border spinner-border-sm" role="status"></span> Carregando...</li>';
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/atualizacoes`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-cache' });
+        if (!response.ok) { throw new Error('Falha ao buscar últimas atualizações.'); }
+        const projetosRecentes = await response.json(); listaElement.innerHTML = '';
+        if (projetosRecentes.length === 0) { listaElement.innerHTML = '<li class="list-group-item text-center text-white-50">Nenhuma atualização recente.</li>'; return; }
+        projetosRecentes.forEach(projeto => {
+            let badgeClass = 'text-bg-secondary'; let actionText = 'Cadastrado';
+            switch(projeto.status) {
+                case 'Concluído': badgeClass = 'text-bg-success'; actionText = 'Concluído'; break;
+                case 'Em Montagem': badgeClass = 'text-bg-primary'; actionText = 'Iniciado'; break;
+                case 'Pendente': badgeClass = 'text-bg-warning'; actionText = 'Pendente'; break;
+            }
+            const tempoAtras = calcularTempoAtras(projeto.data_cadastro);
+            const itemHTML = `<li class="list-group-item"> <span class="badge ${badgeClass}">${actionText}</span> <strong class="ms-2">${projeto.codigo_projeto} - ${projeto.nome_empresa}</strong> <small class="text-white-50 d-block">${tempoAtras}</small> </li>`;
+            listaElement.innerHTML += itemHTML;
+        });
+    } catch (error) { console.error("Erro ao carregar últimas atualizações:", error.message); listaElement.innerHTML = '<li class="list-group-item text-center text-danger">Erro ao carregar atualizações.</li>'; }
 }
 async function carregarPrazosProximos() {
-  const token = localStorage.getItem("authToken"); if (!token) return;
-  const tabelaBody = document.getElementById('tabelaPrazosBody'); if (!tabelaBody) return;
-  tabelaBody.innerHTML = '<tr><td colspan="3" class="text-center text-white-50"><span class="spinner-border spinner-border-sm" role="status"></span> Carregando prazos...</td></tr>';
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/dashboard/prazos`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-cache' });
-    if (!response.ok) { throw new Error('Falha ao buscar prazos de entrega.'); }
-    const projetos = await response.json(); tabelaBody.innerHTML = '';
-    if (projetos.length === 0) { tabelaBody.innerHTML = '<tr><td colspan="3" class="text-center text-white-50">Nenhum prazo de entrega próximo.</td></tr>'; return; }
-    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-    projetos.forEach(projeto => {
-      const dataEntrega = new Date(projeto.data_entrega); dataEntrega.setHours(0 - (dataEntrega.getTimezoneOffset() / 60), 0, 0, 0);
-      const diffTime = dataEntrega - hoje; const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      let prazoTexto = `Em ${diffDays} dias`; let prazoClasseBadge = 'border-info text-info';
-      if (diffDays < 0) { prazoTexto = 'Atrasado'; prazoClasseBadge = 'border-danger text-danger'; }
-      else if (diffDays === 0) { prazoTexto = 'Vence Hoje'; prazoClasseBadge = 'border-danger text-danger'; }
-      else if (diffDays <= 3) { prazoTexto = `Em ${diffDays} dia${diffDays > 1 ? 's' : ''}`; prazoClasseBadge = 'border-warning text-warning'; }
-      else if (diffDays <= 7) { prazoTexto = `Em ${diffDays} dias`; prazoClasseBadge = 'border-primary text-primary'; }
-      const linhaHTML = `<tr> <td>${projeto.codigo_projeto}</td> <td>${projeto.nome_empresa}</td> <td class="text-end"> <span class="badge rounded-pill ${prazoClasseBadge}">${prazoTexto}</span> </td> </tr>`;
-      tabelaBody.innerHTML += linhaHTML;
-    });
-  } catch (error) { console.error("Erro ao carregar prazos próximos:", error.message); tabelaBody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Erro ao carregar prazos.</td></tr>'; }
+    const token = localStorage.getItem("authToken"); if (!token) return;
+    const tabelaBody = document.getElementById('tabelaPrazosBody'); if (!tabelaBody) return;
+    tabelaBody.innerHTML = '<tr><td colspan="3" class="text-center text-white-50"><span class="spinner-border spinner-border-sm" role="status"></span> Carregando prazos...</td></tr>';
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/prazos`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-cache' });
+        if (!response.ok) { throw new Error('Falha ao buscar prazos de entrega.'); }
+        const projetos = await response.json(); tabelaBody.innerHTML = '';
+        if (projetos.length === 0) { tabelaBody.innerHTML = '<tr><td colspan="3" class="text-center text-white-50">Nenhum prazo de entrega próximo.</td></tr>'; return; }
+        const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+        projetos.forEach(projeto => {
+            const dataEntrega = new Date(projeto.data_entrega); dataEntrega.setHours(0 - (dataEntrega.getTimezoneOffset() / 60), 0, 0, 0);
+            const diffTime = dataEntrega - hoje; const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            let prazoTexto = `Em ${diffDays} dias`; let prazoClasseBadge = 'border-info text-info';
+            if (diffDays < 0) { prazoTexto = 'Atrasado'; prazoClasseBadge = 'border-danger text-danger'; }
+             else if (diffDays === 0) { prazoTexto = 'Vence Hoje'; prazoClasseBadge = 'border-danger text-danger'; }
+             else if (diffDays <= 3) { prazoTexto = `Em ${diffDays} dia${diffDays > 1 ? 's' : ''}`; prazoClasseBadge = 'border-warning text-warning'; }
+             else if (diffDays <= 7) { prazoTexto = `Em ${diffDays} dias`; prazoClasseBadge = 'border-primary text-primary'; }
+            const linhaHTML = `<tr> <td>${projeto.codigo_projeto}</td> <td>${projeto.nome_empresa}</td> <td class="text-end"> <span class="badge rounded-pill ${prazoClasseBadge}">${prazoTexto}</span> </td> </tr>`;
+            tabelaBody.innerHTML += linhaHTML;
+        });
+    } catch (error) { console.error("Erro ao carregar prazos próximos:", error.message); tabelaBody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Erro ao carregar prazos.</td></tr>'; }
 }
 function calcularTempoAtras(dataISO) {
-  const agora = new Date(); const dataPassada = new Date(dataISO); const diferencaSegundos = Math.round((agora - dataPassada) / 1000);
-  const minutos = Math.round(diferencaSegundos / 60); const horas = Math.round(diferencaSegundos / 3600); const dias = Math.round(diferencaSegundos / 86400);
-  const semanas = Math.round(diferencaSegundos / 604800); const meses = Math.round(diferencaSegundos / 2629800); const anos = Math.round(diferencaSegundos / 31557600);
-  if (diferencaSegundos < 60) { return `agora mesmo`; } else if (minutos < 60) { return `há ${minutos} min`; } else if (horas < 24) { return `há ${horas} h`; }
-  else if (dias < 7) { return `há ${dias} d`; } else if (semanas < 4) { return `há ${semanas} sem`; } else if (meses < 12) { return `há ${meses} mes`; } else { return `há ${anos} a`; }
+    const agora = new Date(); const dataPassada = new Date(dataISO); const diferencaSegundos = Math.round((agora - dataPassada) / 1000);
+    const minutos = Math.round(diferencaSegundos / 60); const horas = Math.round(diferencaSegundos / 3600); const dias = Math.round(diferencaSegundos / 86400);
+    const semanas = Math.round(diferencaSegundos / 604800); const meses = Math.round(diferencaSegundos / 2629800); const anos = Math.round(diferencaSegundos / 31557600);
+    if (diferencaSegundos < 60) { return `agora mesmo`; } else if (minutos < 60) { return `há ${minutos} min`; } else if (horas < 24) { return `há ${horas} h`; }
+    else if (dias < 7) { return `há ${dias} d`; } else if (semanas < 4) { return `há ${semanas} sem`; } else if (meses < 12) { return `há ${meses} mes`; } else { return `há ${anos} a`; }
 }
 
 /* ============================================= */
@@ -223,62 +211,6 @@ if (loginForm) {
 /* ============================================= */
 /* LÓGICA DA TELA DE PROJETOS (CRUD + NÃO CONFORMIDADE) */
 /* ============================================= */
-
-// ### FUNÇÃO MOVIDA PARA O ESCOPO GLOBAL ###
-// (Para ser acessível pelo listener do DOMContentLoaded)
-async function salvarNaoConformidade(event) {
-  event.preventDefault(); // Impede o envio padrão do formulário
-
-  const id = document.getElementById('naoConformidadeProjectId').value;
-  const teveNaoConformidade = document.getElementById('naoConformidadeCheckbox').checked;
-  const descricaoNaoConformidade = document.getElementById('naoConformidadeDescricao').value;
-  const token = localStorage.getItem("authToken");
-
-  if (!id || !token) { alert("Erro: ID do projeto ou token não encontrado."); return; }
-
-  const dados = {
-    teveNaoConformidade: teveNaoConformidade,
-    descricaoNaoConformidade: teveNaoConformidade ? (descricaoNaoConformidade.trim() || null) : null
-  };
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/projects/${id}/naoconformidade`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify(dados)
-    });
-
-    if (!response.ok) {
-      const erro = await response.json();
-      throw new Error(erro.message || 'Erro ao salvar status de não conformidade.');
-    }
-
-    const modalElement = document.getElementById('naoConformidadeModal');
-    const modalInstance = bootstrap.Modal.getInstance(modalElement);
-    if (modalInstance) { modalInstance.hide(); }
-
-    alert('Status de não conformidade atualizado com sucesso!');
-
-    // Chama carregarProjetos() - mas ela está definida dentro do if() abaixo.
-    // Precisamos garantir que ela possa ser chamada.
-    // A melhor forma é chamar a função global que inicializa a página de projetos,
-    // mas como não temos uma, vamos chamar a 'carregarProjetos' que estará no escopo global
-    // se a lógica for refatorada, ou simplesmente recarregar a tabela.
-    // Por enquanto, vamos assumir que 'carregarProjetos' está acessível ou recarregar a página.
-    // Solução: Vamos definir carregarProjetos no escopo global também.
-    if (typeof carregarProjetos === "function") {
-      carregarProjetos(); // Recarrega a lista
-    } else {
-      console.error("Função carregarProjetos() não encontrada para recarregar a tabela.");
-    }
-
-  } catch (error) {
-    console.error("Erro ao salvar não conformidade:", error);
-    alert(error.message);
-  }
-}
-
-
 const tabelaProjetosCorpo = document.getElementById("projetosTabela");
 if (tabelaProjetosCorpo) { // Executa apenas se estiver na página de projetos
   const filtroNomeInput = document.getElementById("filtroNome");
@@ -302,55 +234,73 @@ if (tabelaProjetosCorpo) { // Executa apenas se estiver na página de projetos
     }
   }
 
-  // ### LISTENER ÚNICO E CORRETO AQUI ###
-  // (Removido do DOMContentLoaded e colocado aqui, onde as funções estão no escopo)
+  // ### LISTENER DE CLIQUE UNIFICADO E CORRIGIDO ###
+  // Colocado aqui, dentro do 'if (tabelaProjetosCorpo)', para ter acesso às funções abaixo
   tabelaProjetosCorpo.addEventListener("click", function (event) {
-    const targetElement = event.target;
-    const linhaClicada = targetElement.closest("tr");
-    if (!linhaClicada || !linhaClicada.dataset.id) return;
-    const idDoProjeto = linhaClicada.dataset.id;
+      const targetElement = event.target;
+      const linhaClicada = targetElement.closest("tr");
+      if (!linhaClicada || !linhaClicada.dataset.id) return;
+      const idDoProjeto = linhaClicada.dataset.id;
 
-    // 1. Checar botão Não Conformidade
-    if (targetElement.closest(".btn-nao-conformidade")) {
-      event.preventDefault();
-      abrirModalNaoConformidade(idDoProjeto); // Esta função está definida abaixo
-      return;
-    }
-
-    // 2. Checar botão Delete
-    if (targetElement.closest(".btn-delete")) {
-      event.preventDefault();
-      if (confirm("Você tem certeza que deseja excluir este projeto?")) {
-        deletarProjeto(idDoProjeto); // Esta função está definida abaixo
+      // 1. Checar botão Não Conformidade
+      if (targetElement.closest(".btn-nao-conformidade")) {
+          event.preventDefault();
+          abrirModalNaoConformidade(idDoProjeto); // Esta função está definida abaixo
+          return; 
       }
-      return;
-    }
 
-    // 3. Checar botão Edit
-    if (targetElement.closest(".btn-edit")) {
-      event.preventDefault();
-      abrirModalDeEdicao(idDoProjeto); // Esta função está definida abaixo
-      return;
-    }
+      // 2. Checar botão Delete
+      if (targetElement.closest(".btn-delete")) {
+          event.preventDefault();
+          if (confirm("Você tem certeza que deseja excluir este projeto?")) {
+              deletarProjeto(idDoProjeto); // Esta função está definida abaixo
+          }
+          return;
+      }
 
-    // 4. Se não for botão, é clique na linha para Detalhes
-    const detailsCard = document.getElementById("projectDetailsCard");
-    if (detailsCard) {
-      document.getElementById("projectCodeDetail").innerText = `Detalhes do Projeto: ${linhaClicada.cells[0].textContent}`;
-      document.getElementById("projectCompanyDetail").innerText = linhaClicada.cells[1].textContent;
-      document.getElementById("projectDescriptionDetail").innerText = linhaClicada.dataset.description || "Sem descrição.";
-      document.getElementById("projectAssemblerDetail").innerText = linhaClicada.dataset.montadoresNomes || "Nenhum";
-      document.getElementById("projectStatusDetail").innerHTML = linhaClicada.cells[4].innerHTML;
-      detailsCard.classList.remove("d-none");
-    }
+      // 3. Checar botão Edit
+      if (targetElement.closest(".btn-edit")) {
+          event.preventDefault();
+          abrirModalDeEdicao(idDoProjeto); // Esta função está definida abaixo
+          return;
+      }
+
+      // 4. Se não for botão, é clique na linha para Detalhes
+      const detailsCard = document.getElementById("projectDetailsCard");
+      if (detailsCard) {
+          document.getElementById("projectCodeDetail").innerText = `Detalhes do Projeto: ${linhaClicada.cells[0].textContent}`;
+          document.getElementById("projectCompanyDetail").innerText = linhaClicada.cells[1].textContent;
+          document.getElementById("projectDescriptionDetail").innerText = linhaClicada.dataset.description || "Sem descrição.";
+          document.getElementById("projectAssemblerDetail").innerText = linhaClicada.dataset.montadoresNomes || "Nenhum";
+          document.getElementById("projectStatusDetail").innerHTML = linhaClicada.cells[4].innerHTML;
+          detailsCard.classList.remove("d-none");
+      }
   });
+
+  // --- Listener do Modal de Não Conformidade (movido para cá) ---
+  const naoConformidadeModalEl = document.getElementById('naoConformidadeModal');
+  if (naoConformidadeModalEl) {
+      const checkbox = document.getElementById('naoConformidadeCheckbox');
+      const descricaoDiv = document.getElementById('naoConformidadeDescricaoDiv');
+      const form = document.getElementById('naoConformidadeForm');
+
+      checkbox.addEventListener('change', function() {
+          descricaoDiv.style.display = this.checked ? 'block' : 'none';
+          if (!this.checked) {
+              document.getElementById('naoConformidadeDescricao').value = '';
+          }
+      });
+      
+      // Chama a função 'salvarNaoConformidade' que está definida abaixo
+      form.addEventListener('submit', salvarNaoConformidade); 
+  }
 
 
   // Função principal para carregar e exibir os projetos na tabela
   async function carregarProjetos() {
     const detailsCard = document.getElementById("projectDetailsCard");
     if (detailsCard) detailsCard.classList.add("d-none");
-    const token = localStorage.getItem("authToken"); if (!token) return;
+    const token = localStorage.getItem("authToken"); if(!token) return;
     const nome = filtroNomeInput ? filtroNomeInput.value : ''; const status = filtroStatusSelect ? filtroStatusSelect.value : '';
     let url = `${API_BASE_URL}/api/projects`; const params = new URLSearchParams();
     if (nome) params.append("nome", nome); if (status) params.append("status", status);
@@ -359,10 +309,10 @@ if (tabelaProjetosCorpo) { // Executa apenas se estiver na página de projetos
     try {
       const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-cache' });
       if (!response.ok) {
-        let errorMsg = "Falha ao buscar projetos.";
-        try { const erroApi = await response.json(); errorMsg = erroApi.message || errorMsg; } catch (e) { /* Ignora */ }
-        throw new Error(errorMsg);
-      }
+           let errorMsg = "Falha ao buscar projetos.";
+           try { const erroApi = await response.json(); errorMsg = erroApi.message || errorMsg; } catch (e) { /* Ignora */ }
+           throw new Error(errorMsg);
+       }
       const projetos = await response.json();
       tabelaProjetosCorpo.innerHTML = "";
       if (projetos.length === 0) { tabelaProjetosCorpo.innerHTML = `<tr><td colspan="6" class="text-center text-white-50">Nenhum projeto encontrado.</td></tr>`; return; }
@@ -374,12 +324,12 @@ if (tabelaProjetosCorpo) { // Executa apenas se estiver na página de projetos
         const badgeClass = getBadgeClass(projeto.status);
 
         const naoConformidadeIcone = projeto.teveNaoConformidade
-          ? '<i class="fas fa-exclamation-circle text-danger ms-1 small" title="Este projeto teve não conformidade registrada"></i>'
-          : '';
+            ? '<i class="fas fa-exclamation-circle text-danger ms-1 small" title="Este projeto teve não conformidade registrada"></i>'
+            : '';
 
         const botaoNaoConformidade = projeto.status === 'Concluído'
-          ? `<a href="#" class="btn btn-sm btn-outline-warning me-2 btn-nao-conformidade" title="Registrar/Ver Não Conformidade"><i class="fas fa-exclamation-triangle"></i></a>`
-          : '';
+            ? `<a href="#" class="btn btn-sm btn-outline-warning me-2 btn-nao-conformidade" title="Registrar/Ver Não Conformidade"><i class="fas fa-exclamation-triangle"></i></a>`
+            : '';
 
         // Guarda os dados de N-C nos data attributes da linha
         const novaLinhaHTML = `
@@ -408,12 +358,7 @@ if (tabelaProjetosCorpo) { // Executa apenas se estiver na página de projetos
       tabelaProjetosCorpo.innerHTML = `<tr><td colspan="6" class="text-center text-danger">${error.message}</td></tr>`;
     }
   }
-  // Tornar a função carregarProjetos acessível globalmente (ou pelo menos para salvarNaoConformidade)
-  // Como 'salvarNaoConformidade' foi movida, ela precisa chamar 'carregarProjetos'
-  // Vamos redefinir 'carregarProjetos' no escopo global para garantir
-  window.carregarProjetos = carregarProjetos;
-
-
+  
   // Função para deletar um projeto
   async function deletarProjeto(id) {
     const token = localStorage.getItem("authToken");
@@ -438,10 +383,10 @@ if (tabelaProjetosCorpo) { // Executa apenas se estiver na página de projetos
       montadorSelect.innerHTML = "";
       const idsMontadoresAssociados = projeto.montadores ? projeto.montadores.map(m => m.id) : [];
       todosMontadores.forEach((montador) => {
-        const option = document.createElement('option');
-        option.value = montador.id; option.textContent = montador.nome;
-        if (idsMontadoresAssociados.includes(montador.id)) { option.selected = true; }
-        montadorSelect.appendChild(option);
+          const option = document.createElement('option');
+          option.value = montador.id; option.textContent = montador.nome;
+          if (idsMontadoresAssociados.includes(montador.id)) { option.selected = true; }
+          montadorSelect.appendChild(option);
       });
       document.getElementById("editProjectId").value = projeto.id;
       document.getElementById("editNomeEmpresa").value = projeto.nome_empresa;
@@ -525,28 +470,60 @@ if (tabelaProjetosCorpo) { // Executa apenas se estiver na página de projetos
 
   // Função para abrir e preencher o modal de Não Conformidade
   function abrirModalNaoConformidade(id) {
-    const linhaProjeto = document.querySelector(`#projetosTabela tr[data-id='${id}']`);
-    if (!linhaProjeto) {
-      console.error("Não foi possível encontrar os dados do projeto na tabela para o ID:", id);
-      alert("Erro ao carregar dados da não conformidade.");
-      return;
-    }
-    const codigoProjeto = linhaProjeto.dataset.codigo || 'N/A';
-    const teveNaoConformidade = linhaProjeto.dataset.teveNaoConformidade === 'true';
-    const descricaoNaoConformidade = linhaProjeto.dataset.descricaoNaoConformidade || '';
-    document.getElementById('naoConformidadeProjectId').value = id;
-    document.getElementById('naoConformidadeProjectCode').textContent = codigoProjeto;
-    const checkbox = document.getElementById('naoConformidadeCheckbox');
-    checkbox.checked = teveNaoConformidade;
-    document.getElementById('naoConformidadeDescricao').value = descricaoNaoConformidade;
-    document.getElementById('naoConformidadeDescricaoDiv').style.display = teveNaoConformidade ? 'block' : 'none';
-    const modalElement = document.getElementById('naoConformidadeModal');
-    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-    modal.show();
+     const linhaProjeto = document.querySelector(`#projetosTabela tr[data-id='${id}']`);
+     if (!linhaProjeto) {
+         console.error("Não foi possível encontrar os dados do projeto na tabela para o ID:", id);
+         alert("Erro ao carregar dados da não conformidade.");
+         return;
+     }
+     const codigoProjeto = linhaProjeto.dataset.codigo || 'N/A';
+     const teveNaoConformidade = linhaProjeto.dataset.teveNaoConformidade === 'true';
+     const descricaoNaoConformidade = linhaProjeto.dataset.descricaoNaoConformidade || '';
+     document.getElementById('naoConformidadeProjectId').value = id;
+     document.getElementById('naoConformidadeProjectCode').textContent = codigoProjeto;
+     const checkbox = document.getElementById('naoConformidadeCheckbox');
+     checkbox.checked = teveNaoConformidade;
+     document.getElementById('naoConformidadeDescricao').value = descricaoNaoConformidade;
+     document.getElementById('naoConformidadeDescricaoDiv').style.display = teveNaoConformidade ? 'block' : 'none';
+     const modalElement = document.getElementById('naoConformidadeModal');
+     const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+     modal.show();
+  }
+  
+  // Função para salvar o status de Não Conformidade (agora dentro do escopo)
+  async function salvarNaoConformidade(event) {
+      event.preventDefault(); 
+      const id = document.getElementById('naoConformidadeProjectId').value;
+      const teveNaoConformidade = document.getElementById('naoConformidadeCheckbox').checked;
+      const descricaoNaoConformidade = document.getElementById('naoConformidadeDescricao').value;
+      const token = localStorage.getItem("authToken");
+      if (!id || !token) { alert("Erro: ID do projeto ou token não encontrado."); return; }
+      const dados = {
+          teveNaoConformidade: teveNaoConformidade,
+          descricaoNaoConformidade: teveNaoConformidade ? (descricaoNaoConformidade.trim() || null) : null
+      };
+      try {
+          const response = await fetch(`${API_BASE_URL}/api/projects/${id}/naoconformidade`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+              body: JSON.stringify(dados)
+          });
+          if (!response.ok) {
+              const erro = await response.json();
+              throw new Error(erro.message || 'Erro ao salvar status de não conformidade.');
+          }
+          const modalElement = document.getElementById('naoConformidadeModal');
+          const modalInstance = bootstrap.Modal.getInstance(modalElement);
+          if (modalInstance) { modalInstance.hide(); }
+          alert('Status de não conformidade atualizado com sucesso!');
+          carregarProjetos(); // Agora 'carregarProjetos' está no mesmo escopo
+      } catch (error) {
+          console.error("Erro ao salvar não conformidade:", error);
+          alert(error.message);
+      }
   }
 
-  // Iniciar o carregamento dos projetos
-  carregarProjetos();
+  carregarProjetos(); // Carrega os projetos quando a página é acessada
 } // Fim do if (tabelaProjetosCorpo)
 
 /* ============================================= */
@@ -561,18 +538,18 @@ if (tabelaMontadoresCorpo) { // Executa apenas na página de montadores
     const targetElement = event.target;
     const deleteButton = targetElement.closest('.btn-delete-montador');
     if (deleteButton) {
-      event.preventDefault();
-      const linhaDoMontador = targetElement.closest('tr');
-      const montadorId = linhaDoMontador.dataset.id;
-      const montadorNome = linhaDoMontador.cells[1].textContent;
-      if (confirm(`Você tem certeza que deseja excluir o montador "${montadorNome}"?`)) { deletarMontador(montadorId); }
+        event.preventDefault();
+        const linhaDoMontador = targetElement.closest('tr');
+        const montadorId = linhaDoMontador.dataset.id;
+        const montadorNome = linhaDoMontador.cells[1].textContent;
+        if (confirm(`Você tem certeza que deseja excluir o montador "${montadorNome}"?`)) { deletarMontador(montadorId); }
     }
     const editButton = targetElement.closest('.btn-edit-montador');
     if (editButton) {
-      event.preventDefault();
-      const linhaDoMontador = targetElement.closest('tr');
-      const montadorId = linhaDoMontador.dataset.id;
-      abrirModalEdicaoMontador(montadorId);
+        event.preventDefault();
+        const linhaDoMontador = targetElement.closest('tr');
+        const montadorId = linhaDoMontador.dataset.id;
+        abrirModalEdicaoMontador(montadorId);
     }
   });
 }
@@ -608,12 +585,12 @@ if (addMontadorForm && addMontadorModalEl) {
   });
 }
 async function deletarMontador(id) {
-  const token = localStorage.getItem('authToken');
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/montadores/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-    if (response.status === 204) { alert('Montador excluído com sucesso!'); carregarMontadores(); }
-    else { const erro = await response.json(); throw new Error(erro.message || 'Erro ao excluir montador.'); }
-  } catch (error) { alert(error.message); }
+    const token = localStorage.getItem('authToken');
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/montadores/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }});
+        if (response.status === 204) { alert('Montador excluído com sucesso!'); carregarMontadores(); }
+        else { const erro = await response.json(); throw new Error(erro.message || 'Erro ao excluir montador.'); }
+    } catch (error) { alert(error.message); }
 }
 async function abrirModalEdicaoMontador(id) {
   const token = localStorage.getItem('authToken');
