@@ -8,7 +8,8 @@ require('dotenv').config();
 const userRoutes = require('./routes/userRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const montadorRoutes = require('./routes/montadorRoutes');
-const dashboardRoutes = require('./routes/dashboardRoutes'); // <-- LINHA NOVA
+const dashboardRoutes = require('./routes/dashboardRoutes'); 
+const reportRoutes = require('./routes/reportRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -32,7 +33,8 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/montadores', montadorRoutes);
-app.use('/api/dashboard', dashboardRoutes); // <-- LINHA NOVA
+app.use('/api/dashboard', dashboardRoutes); 
+app.use('/api/reports', reportRoutes);
 
 app.get('/', (req, res) => {
   res.send('API do SGP está a funcionar!');

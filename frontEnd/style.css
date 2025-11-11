@@ -73,23 +73,10 @@ body {
 }
 
 /* ======================================================= */
-/* ESTILOS DE FORMULÁRIO "GLASS" (COM CORREÇÃO DE AUTOFILL) */
+/* ESTILOS DE FORMULÁRIO "GLASS" (Para Dashboard/Modais)   */
 /* ======================================================= */
 
-/* --- 1. Animação para forçar a COR DO TEXTO --- */
-/* Nós não mudamos o fundo, só a cor do texto para preto */
-@keyframes autofill-text-color-fix {
-  from {
-    /* Não importa */
-  }
-  to {
-    /* Força o texto preenchido a ser preto e legível */
-    -webkit-text-fill-color: #000 !important;
-  }
-}
-
 /* --- 2. Estilo Base para Inputs "Glass" --- */
-/* Este é o seu 'form-control-glass' original e limpo */
 .form-control-glass, 
 .form-select-glass {
   background-color: rgba(0, 0, 0, 0.2) !important;
@@ -113,34 +100,7 @@ body {
   caret-color: #fff !important; 
 }
 
-/* --- 4. A MÁGICA DO AUTOFILL --- */
-input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  
-  /* Cor do TEXTO preenchido (força com animação) */
-  -webkit-text-fill-color: #000 !important;
-  animation-name: autofill-text-color-fix;
-  animation-duration: 1s; /* Duração arbitrária */
-  
-  /* O Fundo continua branco (forçado pelo navegador), 
-     mas agora o texto é preto, então fica legível! */
-  
-  /* Remove qualquer sombra interna que tentamos antes */
-  -webkit-box-shadow: none !important; 
-  transition: background-color 0s ease 0s !important;
-}
-
-/* --- 5. CORREÇÃO DO LABEL FLUTUANTE --- */
-/* Se o autofill está ativo (fundo branco),
-   nós forçamos o label a ficar cinza escuro para ser legível. */
-
-input:-webkit-autofill ~ label {
-    color: #6c757d !important; /* Cinza escuro do Bootstrap */
-}
-
-/* --- 6. Estilos dos componentes de texto (do seu CSS) --- */
+/* --- 4. Estilos dos componentes de texto (do seu CSS) --- */
 .form-select-glass {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
 }
@@ -276,4 +236,18 @@ body.login-page {
 .login-container a:hover {
     color: #fff !important;
     text-decoration: underline;
+}
+
+/* ============================================= */
+/* AJUSTE PARA LABELS FLUTUANTES EM FUNDO BRANCO */
+/* ============================================= */
+
+/* Esta é a correção para os inputs brancos que estamos usando 
+   na tela de login e cadastro. */
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: #6c757d; /* Cor do label quando encolhido */
+}
+
+.form-floating > label {
+    color: #6c757d; /* Cor do label quando expandido */
 }
