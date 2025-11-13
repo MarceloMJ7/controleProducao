@@ -5,9 +5,10 @@ const prisma = new PrismaClient();
 
 exports.generateReport = async (req, res) => {
     const {
-        reportType,  // 'projeto' ou 'montador'
-        montadorId,  // ID do montador
-        status,      // Status do projeto
+        reportType,
+        montadorId,
+        status,
+        teveNaoConformidade,
         startDate,
         endDate
     } = req.body;
@@ -22,12 +23,9 @@ exports.generateReport = async (req, res) => {
         };
 
         // --- 1. PREPARA O FILTRO DE DATA ---
-        // O filtro de data será aplicado a todos os projetos consultados
         const dateFilter = {};
         if (startDate || endDate) {
-            // Usamos 'updatedAt' como referência, pois é quando o status
-            // (ex: 'Concluído') é definido.
-            dateFilter.updatedAt = {};
+            dateFilter.updatedAt = {}; // Usando 'updatedAt' (quando foi concluído/atualizado)
             if (startDate) {
                 dateFilter.updatedAt.gte = new Date(startDate);
             }
@@ -41,54 +39,62 @@ exports.generateReport = async (req, res) => {
         // --- 2. LÓGICA DO RELATÓRIO "GERAL DE PROJETOS" ---
         if (reportType === 'projeto') {
             
-            const whereClause = {
+            // --- CONSULTA PARA KPIs E GRÁFICO (Ignora filtros de status/NC) ---
+            const statsWhere = {
                 criadoPorId: usuarioId,
-                ...dateFilter // Aplica o filtro de data
+                ...dateFilter
             };
-
-            if (status) {
-                whereClause.status = status;
-            }
-
-            // Busca os projetos para a tabela
-            const projetos = await prisma.projeto.findMany({
-                where: whereClause,
-                select: {
-                    codigo_projeto: true,
-                    nome_empresa: true,
-                    status: true,
-                    data_cadastro: true,
-                    data_entrega: true,
-                    teveNaoConformidade: true,
-                    montadores: { select: { nome: true } }
-                },
-                orderBy: { data_entrega: 'desc' }
+            
+            const todosProjetosDoPeriodo = await prisma.projeto.findMany({
+                where: statsWhere,
+                select: { status: true, teveNaoConformidade: true }
             });
 
-            // Popula os dados da tabela
-            responseData.tableData = projetos;
-
-            // Calcula as estatísticas (KPIs)
-            const totalProjetos = projetos.length;
-            const totalConcluidos = projetos.filter(p => p.status === 'Concluído').length;
-            const totalEmMontagem = projetos.filter(p => p.status === 'Em Montagem').length;
-            const totalPendentes = projetos.filter(p => p.status === 'Pendente').length;
-            const totalNaoConformes = projetos.filter(p => p.teveNaoConformidade).length;
+            // Calcula as estatísticas (KPIs) com base em TODOS os projetos
+            const totalProjetos = todosProjetosDoPeriodo.length;
+            const totalConcluidos = todosProjetosDoPeriodo.filter(p => p.status === 'Concluído').length;
+            const totalEmMontagem = todosProjetosDoPeriodo.filter(p => p.status === 'Em Montagem').length;
+            const totalPendentes = todosProjetosDoPeriodo.filter(p => p.status === 'Pendente').length;
+            const totalNaoConformes = todosProjetosDoPeriodo.filter(p => p.teveNaoConformidade).length;
 
             responseData.statistics = {
                 totalProjetos: totalProjetos,
                 percConcluidos: totalProjetos > 0 ? (totalConcluidos / totalProjetos * 100).toFixed(0) : 0,
+                percEmMontagem: totalProjetos > 0 ? (totalEmMontagem / totalProjetos * 100).toFixed(0) : 0, // <-- LINHA ADICIONADA
                 percPendentes: totalProjetos > 0 ? (totalPendentes / totalProjetos * 100).toFixed(0) : 0,
-                // % de não conformidade sobre os concluídos
                 percNaoConformes: totalConcluidos > 0 ? (totalNaoConformes / totalConcluidos * 100).toFixed(0) : 0,
             };
 
             // Prepara dados para o Gráfico de Pizza (Status)
             responseData.chartData = {
                 type: 'pie',
+                title: 'Distribuição de Status de Projetos',
                 labels: ['Concluídos', 'Em Montagem', 'Pendentes'],
                 data: [totalConcluidos, totalEmMontagem, totalPendentes]
             };
+
+            // --- CONSULTA PARA A TABELA (Respeita TODOS os filtros) ---
+            const tableWhere = { ...statsWhere }; 
+            if (status) {
+                tableWhere.status = status; 
+            }
+            if (teveNaoConformidade === 'true') {
+                tableWhere.teveNaoConformidade = true; 
+            } else if (teveNaoConformidade === 'false') {
+                tableWhere.teveNaoConformidade = false; 
+            }
+
+            const projetosFiltrados = await prisma.projeto.findMany({
+                where: tableWhere,
+                select: {
+                    codigo_projeto: true, nome_empresa: true, status: true,
+                    data_cadastro: true, data_entrega: true, teveNaoConformidade: true,
+                    montadores: { select: { nome: true } }
+                },
+                orderBy: { data_entrega: 'desc' }
+            });
+            
+            responseData.tableData = projetosFiltrados;
         }
         
         // --- 3. LÓGICA DO RELATÓRIO "DESEMPENHO DO MONTADOR" ---
@@ -106,25 +112,17 @@ exports.generateReport = async (req, res) => {
 
             const baseProjectWhere = {
                 criadoPorId: usuarioId,
-                status: 'Concluído', // Relatório de montador foca em produtividade (concluídos)
+                status: 'Concluído', 
                 ...dateFilter
             };
 
-            // Gera a tabela e os dados do gráfico
-            const montadorStats = await Promise.all(
+            let montadorStats = await Promise.all(
                 montadores.map(async (montador) => {
                     const concluidos = await prisma.projeto.count({
-                        where: {
-                            ...baseProjectWhere,
-                            montadores: { some: { id: montador.id } },
-                        }
+                        where: { ...baseProjectWhere, montadores: { some: { id: montador.id } } }
                     });
                     const naoConformes = await prisma.projeto.count({
-                        where: {
-                            ...baseProjectWhere,
-                            montadores: { some: { id: montador.id } },
-                            teveNaoConformidade: true
-                        }
+                        where: { ...baseProjectWhere, montadores: { some: { id: montador.id } }, teveNaoConformidade: true }
                     });
                     return {
                         id: montador.id,
@@ -135,10 +133,12 @@ exports.generateReport = async (req, res) => {
                 })
             );
 
-            // Popula os dados da tabela
+            montadorStats.sort((a, b) => b.projetosConcluidos - a.projetosConcluidos);
+            
             responseData.tableData = montadorStats;
 
-            // Calcula as estatísticas (KPIs)
+            const top10Montadores = montadorStats.slice(0, 10);
+            
             const totalMontadores = montadorStats.length;
             const totalProjetosConcluidos = montadorStats.reduce((acc, m) => acc + m.projetosConcluidos, 0);
             const totalNaoConformidades = montadorStats.reduce((acc, m) => acc + m.naoConformidades, 0);
@@ -150,26 +150,23 @@ exports.generateReport = async (req, res) => {
                 taxaNaoConformidadeGeral: totalProjetosConcluidos > 0 ? (totalNaoConformidades / totalProjetosConcluidos * 100).toFixed(0) : 0
             };
 
-            // Prepara dados para o Gráfico de Barras (Desempenho)
             responseData.chartData = {
                 type: 'bar',
-                labels: montadorStats.map(m => m.nome),
+                title: montadorId ? 'Desempenho do Montador' : 'Top 10 Montadores por Projetos Concluídos',
+                labels: top10Montadores.map(m => m.nome),
                 datasets: [
                     {
                         label: 'Projetos Concluídos',
-                        data: montadorStats.map(m => m.projetosConcluidos),
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)', // Azul
+                        data: top10Montadores.map(m => m.projetosConcluidos),
                     },
                     {
                         label: 'Não Conformidades',
-                        data: montadorStats.map(m => m.naoConformidades),
-                        backgroundColor: 'rgba(255, 99, 132, 0.7)', // Vermelho
+                        data: top10Montadores.map(m => m.naoConformidades),
                     }
                 ]
             };
         }
         
-        // Retorna o objeto completo
         res.status(200).json(responseData);
 
     } catch (error) {

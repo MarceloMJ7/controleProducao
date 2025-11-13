@@ -9,6 +9,9 @@
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,13 +25,17 @@
                 <li><a href="gerenciador_Montadores.html" class="nav-link"><i class="fas fa-users-cog fa-fw me-2"></i> Montadores</a></li>
                 <li><a href="relatorios.html" class="nav-link active" aria-current="page"><i class="fas fa-chart-pie fa-fw me-2"></i> Relatórios</a></li>
             </ul><hr>
-            <div class="dropdown"><a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong id="nomeUsuarioLogado">Usuário</strong></a><ul class="dropdown-menu dropdown-menu-dark text-small shadow"><li><a class="dropdown-item" href="#" id="logoutButton">Sair</a></li></ul></div>
+            <div class="dropdown"><a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong id="nomeUsuarioLogado">Usuário</strong></a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                    <li><a class="dropdown-item" href="#" id="logoutButton">Sair</a></li>
+                </ul>
+            </div>
         </div>
         
         <div class="main-content p-4">
             <h1 class="h2 text-white mb-4">Relatórios de Produção</h1>
 
-            <div class="card glass-card mb-4">
+            <div class="card glass-card mb-4" id="reportFilterCard">
                 <div class="card-header fw-bold text-white border-bottom-0"><i class="fas fa-filter me-2"></i> Selecione os Filtros</div>
                 <div class="card-body">
                     <form class="row g-3 align-items-end" id="reportForm">
@@ -39,25 +46,31 @@
                                 <option value="montador">Desempenho por Montador</option>
                             </select>
                         </div>
-                        <div class="col-md-3 d-none" id="montadorFilter">
+                        <div class="col-md-3">
+                            <label for="startDate" class="form-label text-white-50">Período (De)</label>
+                            <input type="date" class="form-control form-control-glass" id="startDate">
+                        </div>
+                         <div class="col-md-3">
+                            <label for="endDate" class="form-label text-white-50">Período (Até)</label>
+                            <input type="date" class="form-control form-control-glass" id="endDate">
+                        </div>
+                        <div class="col-md-3" id="montadorFilter">
                             <label for="montadorSelect" class="form-label text-white-50">Montador</label>
                             <select id="montadorSelect" class="form-select form-select-glass">
-                                <option>Todos</option>
-                            </select>
+                                </select>
                         </div>
                         <div class="col-md-3" id="statusFilter">
                             <label for="statusSelect" class="form-label text-white-50">Status do Projeto</label>
                             <select id="statusSelect" class="form-select form-select-glass">
-                                <option>Todos</option>
+                                </select>
+                        </div>
+                        <div class="col-md-3" id="naoConformidadeFilter">
+                            <label for="naoConformidadeSelect" class="form-label text-white-50">Não Conformidade</label>
+                            <select id="naoConformidadeSelect" class="form-select form-select-glass">
+                                <option value="">Todos</option>
+                                <option value="true">Apenas Com N/C</option>
+                                <option value="false">Apenas Sem N/C</option>
                             </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="startDate" class="form-label text-white-50">Período de</label>
-                            <input type="date" class="form-control form-control-glass" id="startDate">
-                        </div>
-                         <div class="col-md-3">
-                            <label for="endDate" class="form-label text-white-50">Até</label>
-                            <input type="date" class="form-control form-control-glass" id="endDate">
                         </div>
                         <div class="col-12 text-end">
                             <button type="submit" class="btn btn-primary fw-bold px-4"><i class="fas fa-cogs me-2"></i> Gerar</button>
@@ -66,37 +79,40 @@
                 </div>
             </div>
 
-            <div id="visualResults" class="d-none">
-                <div class="row g-4 mb-4" id="kpiCardsRow">
-                    </div>
-                <div class="row g-4 mb-4">
-                    <div class="col-md-12">
-                        <div class="card glass-card">
-                            <div class="card-body" style="height: 350px;">
-                                <canvas id="reportChart"></canvas>
+            <div id="reportableContent">
+                <div id="visualResults" class="d-none">
+                    <div class="row g-4 mb-4" id="kpiCardsRow">
+                        </div>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-12">
+                            <div class="card glass-card">
+                                 <div class="card-header fw-bold text-white border-bottom-0" id="chartTitle">Gráfico de Desempenho</div>
+                                <div class="card-body" style="height: 400px;">
+                                    <canvas id="reportChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-
-            <div class="card glass-card">
-                <div class="card-header fw-bold text-white d-flex justify-content-between align-items-center">
-                    <span id="reportTitle">Resultados Detalhados</span>
-                    <button class="btn btn-sm btn-outline-success"><i class="fas fa-file-excel me-2"></i> Exportar</button>
-                </div>
-                <div class="card-body">
-                    <div id="reportPlaceholder" class="text-center text-white-50 py-5"><i class="fas fa-hand-pointer fa-3x mb-3"></i><p>Preencha os filtros e clique em "Gerar".</p></div>
-                    <div id="reportResults" class="table-responsive d-none">
-                        <table class="table table-hover table-glass">
-                            <thead id="reportTableHeader"></thead>
-                            <tbody id="reportTableBody"></tbody>
-                        </table>
+                <div class="card glass-card" id="reportTableCard">
+                    <div class="card-header fw-bold text-white d-flex justify-content-between align-items-center">
+                        <span id="reportTitle">Resultados Detalhados</span>
+                        <button class="btn btn-sm btn-outline-success" id="exportPdfButton" disabled>
+                            <i class="fas fa-file-pdf me-2"></i>Exportar PDF
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="reportPlaceholder" class="text-center text-white-50 py-5"><i class="fas fa-hand-pointer fa-3x mb-3"></i><p>Preencha os filtros e clique em "Gerar".</p></div>
+                        <div id="reportResults" class="table-responsive d-none">
+                            <table class="table table-hover table-glass">
+                                <thead id="reportTableHeader"></thead>
+                                <tbody id="reportTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div> </div>
     </main>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
