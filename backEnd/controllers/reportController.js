@@ -60,8 +60,13 @@ exports.generateReport = async (req, res) => {
             responseData.statistics = {
                 totalProjetos: totalProjetos,
                 percConcluidos: totalProjetos > 0 ? (totalConcluidos / totalProjetos * 100).toFixed(0) : 0,
-                percEmMontagem: totalProjetos > 0 ? (totalEmMontagem / totalProjetos * 100).toFixed(0) : 0, // <-- LINHA ADICIONADA
+                percEmMontagem: totalProjetos > 0 ? (totalEmMontagem / totalProjetos * 100).toFixed(0) : 0, 
+                
+                // ==========================================================
+                // ==== ESTA É A LINHA QUE FOI CORRIGIDA (adicionado : 0) ====
+                // ==========================================================
                 percPendentes: totalProjetos > 0 ? (totalPendentes / totalProjetos * 100).toFixed(0) : 0,
+                
                 percNaoConformes: totalConcluidos > 0 ? (totalNaoConformes / totalConcluidos * 100).toFixed(0) : 0,
             };
 
