@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,51 +8,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
     <main class="d-flex flex-nowrap">
         <div class="sidebar d-flex flex-column flex-shrink-0 p-3 text-bg-dark">
-            <a href="dashboard.html" class="d-flex align-items.center mb-3 text-white text-decoration-none"><i
-                    class="fas fa-cogs fa-2x me-2"></i><span class="fs-4 fw-bold">SGP</span></a>
-            <hr>
+            <a href="dashboard.html" class="d-flex align-items.center mb-3 text-white text-decoration-none"><i class="fas fa-cogs fa-2x me-2"></i><span class="fs-4 fw-bold">SGP</span></a><hr>
             <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i
-                            class="fas fa-tachometer-alt fa-fw me-2"></i> Painel de Controle</a></li>
-                <li><a href="gerenciador_Projetos.html" class="nav-link active" aria-current="page"><i
-                            class="fas fa-project-diagram fa-fw me-2"></i> Projetos</a></li>
-                <li><a href="gerenciador_Montadores.html" class="nav-link"><i class="fas fa-users-cog fa-fw me-2"></i>
-                        Montadores</a></li>
-                <li><a href="relatorios.html" class="nav-link"><i class="fas fa-chart-pie fa-fw me-2"></i>
-                        Relatórios</a></li>
-            </ul>
-            <hr>
-            <div class="dropdown"><a href="#"
-                    class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle"
-                    data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong
-                        id="nomeUsuarioLogado">Usuário</strong></a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                    <li><a class="dropdown-item" href="login.html">Sair</a></li>
-                </ul>
-            </div>
+                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt fa-fw me-2"></i> Painel de Controle</a></li>
+                <li><a href="gerenciador_Projetos.html" class="nav-link active" aria-current="page"><i class="fas fa-project-diagram fa-fw me-2"></i> Projetos</a></li>
+                <li><a href="gerenciador_Montadores.html" class="nav-link"><i class="fas fa-users-cog fa-fw me-2"></i> Montadores</a></li>
+                <li><a href="relatorios.html" class="nav-link"><i class="fas fa-chart-pie fa-fw me-2"></i> Relatórios</a></li>
+            </ul><hr>
+            <div class="dropdown"><a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong id="nomeUsuarioLogado">Usuário</strong></a><ul class="dropdown-menu dropdown-menu-dark text-small shadow"><li><a class="dropdown-item" href="#" id="logoutButton">Sair</a></li></ul></div>
         </div>
-
+        
         <div class="main-content p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h2 text-white">Gerenciar Projetos</h1>
-                <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal"
-                    data-bs-target="#addProjectModal"><i class="fas fa-plus me-2"></i> Adicionar Projeto</button>
+                <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#addProjectModal"><i class="fas fa-plus me-2"></i> Adicionar Projeto</button>
             </div>
-
+            
             <div class="card glass-card">
                 <div class="card-header border-bottom border-secondary border-opacity-25">
                     <div class="row g-3 align-items-center">
                         <div class="col-md-8">
                             <div class="input-group">
-                                <span class="input-group-text input-group-text-glass"><i
-                                        class="fas fa-search"></i></span>
-                                <input type="text" class="form-control form-control-glass" id="filtroNome"
-                                    placeholder="Buscar por código ou nome da empresa...">
+                                <span class="input-group-text input-group-text-glass"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control form-control-glass" id="filtroNome" placeholder="Buscar por código ou nome da empresa...">
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -65,9 +46,8 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
+                 </div>
+                <div class="card-body p-0"> <div class="table-responsive">
                         <table class="table table-hover table-glass mb-0">
                             <thead>
                                 <tr>
@@ -80,12 +60,17 @@
                                 </tr>
                             </thead>
                             <tbody id="projetosTabela">
-                                <tr>
-                                    <td colspan="6" class="text-center text-white-50">Carregando...</td>
-                                </tr>
+                                <tr><td colspan="6" class="text-center text-white-50">Carregando...</td></tr>
                             </tbody>
                         </table>
                     </div>
+                </div>
+                <div class="card-footer border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                    <span class="text-white-50 small" id="paginacaoInfo">Mostrando 0 de 0</span>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0" id="paginacaoContainer">
+                            </ul>
+                    </nav>
                 </div>
             </div>
 
@@ -105,9 +90,7 @@
                                 </div>
                                 <div class="col-md-6 col-lg-4">
                                     <p class="text-white-50 mb-1"><strong>Status:</strong></p>
-                                    <div id="projectStatusDetail"><span
-                                            class="badge rounded-pill border border-secondary text-secondary">Carregando...</span>
-                                    </div>
+                                    <div id="projectStatusDetail"><span class="badge rounded-pill border border-secondary text-secondary">Carregando...</span></div>
                                 </div>
                             </div>
                         </div>
@@ -115,7 +98,7 @@
                 </div>
             </div>
         </div>
-    </main>
+        </main>
 
     <div class="modal fade" id="addProjectModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -127,45 +110,20 @@
                 <form id="addProjectForm">
                     <div class="modal-body">
                         <div class="row g-3">
-                            <div class="col-md-6"><label for="nomeEmpresa" class="form-label text-white-50">Nome da
-                                    Empresa</label><input id="nomeEmpresa" type="text"
-                                    class="form-control form-control-glass" required></div>
-                            <div class="col-md-6"><label for="codigoProjeto" class="form-label text-white-50">Código do
-                                    Projeto</label><input id="codigoProjeto" type="text"
-                                    class="form-control form-control-glass" required></div>
+                            <div class="col-md-6"><label for="nomeEmpresa" class="form-label text-white-50">Nome da Empresa</label><input id="nomeEmpresa" type="text" class="form-control form-control-glass" required></div>
+                            <div class="col-md-6"><label for="codigoProjeto" class="form-label text-white-50">Código do Projeto</label><input id="codigoProjeto" type="text" class="form-control form-control-glass" required></div>
                             <div class="col-md-6">
-                                <label for="montadorResponsavel" class="form-label text-white-50">Montadores
-                                    Responsáveis</label>
-                                <select class="form-select form-select-glass" id="montadorResponsavel" multiple
-                                    style="height: 150px;">
-                                   
-                                </select>
-                                <small class="form-text text-white-50">Segure Ctrl (ou Cmd) para selecionar mais de
-                                    um.</small>
+                                <label for="montadorResponsavel" class="form-label text-white-50">Montadores Responsáveis</label>
+                                <select class="form-select form-select-glass" id="montadorResponsavel" multiple style="height: 150px;"></select>
+                                <small class="form-text text-white-50">Segure Ctrl (ou Cmd) para selecionar mais de um.</small>
                             </div>
-                            <div class="col-md-6"><label for="statusInicial" class="form-label text-white-50">Status
-                                    Inicial</label><select id="statusInicial" class="form-select form-select-glass">
-                                    <option selected>Pendente</option>
-                                    <option>Em Montagem</option>
-                                    <option>Concluído</option>
-                                </select></div>
-                            <div class="col-md-6"><label for="dataCadastro" class="form-label text-white-50">Data de
-                                    Cadastro</label><input id="dataCadastro" type="date"
-                                    class="form-control form-control-glass" required></div>
-
-                            <div class="col-md-6">
-                                <label for="dataEntrega" class="form-label text-white-50">Data de Entrega</label>
-                                <input id="dataEntrega" type="date" class="form-control form-control-glass" required>
-                            </div>
-                            <div class="col-12"><label for="descricao" class="form-label text-white-50">Descrição
-                                    (Opcional)</label><textarea id="descricao" class="form-control form-control-glass"
-                                    rows="2"></textarea></div>
+                            <div class="col-md-6"><label for="statusInicial" class="form-label text-white-50">Status Inicial</label><select id="statusInicial" class="form-select form-select-glass"><option selected>Pendente</option><option>Em Montagem</option><option>Concluído</option></select></div>
+                            <div class="col-md-6"><label for="dataCadastro" class="form-label text-white-50">Data de Cadastro</label><input id="dataCadastro" type="date" class="form-control form-control-glass" required></div>
+                            <div class="col-md-6"><label for="dataEntrega" class="form-label text-white-50">Data de Entrega</label><input id="dataEntrega" type="date" class="form-control form-control-glass" required></div>
+                            <div class="col-12"><label for="descricao" class="form-label text-white-50">Descrição (Opcional)</label><textarea id="descricao" class="form-control form-control-glass" rows="2"></textarea></div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Salvar Projeto</button>
-                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-primary">Salvar Projeto</button></div>
                 </form>
             </div>
         </div>
@@ -173,55 +131,21 @@
     <div class="modal fade" id="editProjectModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content modal-glass">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5 text-white">Editar Projeto</h1>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
+                <div class="modal-header"><h1 class="modal-title fs-5 text-white">Editar Projeto</h1><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
                 <form id="editProjectForm">
                     <input type="hidden" id="editProjectId">
                     <div class="modal-body">
                         <div class="row g-3">
-                            <div class="col-md-6"><label for="editNomeEmpresa" class="form-label text-white-50">Nome da
-                                    Empresa</label><input id="editNomeEmpresa" type="text"
-                                    class="form-control form-control-glass" required></div>
-                            <div class="col-md-6"><label for="editCodigoProjeto" class="form-label text-white-50">Código
-                                    do Projeto</label><input id="editCodigoProjeto" type="text"
-                                    class="form-control form-control-glass" required></div>
-                            <div class="col-md-6">
-                                <label for="editMontadorResponsavel" class="form-label text-white-50">Montadores
-                                    Responsáveis</label>
-                                <select class="form-select form-select-glass" id="editMontadorResponsavel" multiple
-                                    style="height: 150px;">
-                                
-                                </select>
-                                <small class="form-text text-white-50">Segure Ctrl (ou Cmd) para
-                                    selecionar/desselecionar.</small>
-                            </div>
-                            <div class="col-md-6"><label for="editStatus"
-                                    class="form-label text-white-50">Status</label><select id="editStatus"
-                                    class="form-select form-select-glass">
-                                    <option>Pendente</option>
-                                    <option>Em Montagem</option>
-                                    <option>Concluído</option>
-                                </select></div>
-                            <div class="col-md-6"><label for="editDataCadastro" class="form-label text-white-50">Data de
-                                    Cadastro</label><input id="editDataCadastro" type="date"
-                                    class="form-control form-control-glass" required></div>
-
-                            <div class="col-md-6">
-                                <label for="editDataEntrega" class="form-label text-white-50">Data de Entrega</label>
-                                <input id="editDataEntrega" type="date" class="form-control form-control-glass"
-                                    required>
-                            </div>
-                            <div class="col-12"><label for="editDescricao" class="form-label text-white-50">Descrição
-                                    (Opcional)</label><textarea id="editDescricao"
-                                    class="form-control form-control-glass" rows="2"></textarea></div>
+                            <div class="col-md-6"><label for="editNomeEmpresa" class="form-label text-white-50">Nome da Empresa</label><input id="editNomeEmpresa" type="text" class="form-control form-control-glass" required></div>
+                            <div class="col-md-6"><label for="editCodigoProjeto" class="form-label text-white-50">Código do Projeto</label><input id="editCodigoProjeto" type="text" class="form-control form-control-glass" required></div>
+                            <div class="col-md-6"><label for="editMontadorResponsavel" class="form-label text-white-50">Montadores Responsáveis</label><select class="form-select form-select-glass" id="editMontadorResponsavel" multiple style="height: 150px;"></select><small class="form-text text-white-50">Segure Ctrl (ou Cmd) para selecionar/desselecionar.</small></div>
+                            <div class="col-md-6"><label for="editStatus" class="form-label text-white-50">Status</label><select id="editStatus" class="form-select form-select-glass"><option>Pendente</option><option>Em Montagem</option><option>Concluído</option></select></div>
+                            <div class="col-md-6"><label for="editDataCadastro" class="form-label text-white-50">Data de Cadastro</label><input id="editDataCadastro" type="date" class="form-control form-control-glass" required></div>
+                            <div class="col-md-6"><label for="editDataEntrega" class="form-label text-white-50">Data de Entrega</label><input id="editDataEntrega" type="date" class="form-control form-control-glass" required></div>
+                            <div class="col-12"><label for="editDescricao" class="form-label text-white-50">Descrição (Opcional)</label><textarea id="editDescricao" class="form-control form-control-glass" rows="2"></textarea></div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-primary">Salvar Alterações</button></div>
                 </form>
             </div>
         </div>
@@ -229,38 +153,21 @@
     <div class="modal fade" id="naoConformidadeModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-glass">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5 text-white">Registrar Não Conformidade</h1>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
+                <div class="modal-header"><h1 class="modal-title fs-5 text-white">Registrar Não Conformidade</h1><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
                 <form id="naoConformidadeForm">
                     <input type="hidden" id="naoConformidadeProjectId">
                     <div class="modal-body">
-                        <p class="text-white-50 mb-3">Projeto: <strong
-                                id="naoConformidadeProjectCode">Carregando...</strong></p>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" value="" id="naoConformidadeCheckbox">
-                            <label class="form-check-label text-white" for="naoConformidadeCheckbox">
-                                Marcar como "Teve Não Conformidade"
-                            </label>
-                        </div>
-                        <div class="mb-3" id="naoConformidadeDescricaoDiv" style="display: none;">
-                            <label for="naoConformidadeDescricao" class="form-label text-white-50">Descrição da Não
-                                Conformidade (Opcional)</label>
-                            <textarea id="naoConformidadeDescricao" class="form-control form-control-glass"
-                                rows="3"></textarea>
-                        </div>
+                        <p class="text-white-50 mb-3">Projeto: <strong id="naoConformidadeProjectCode">Carregando...</strong></p>
+                        <div class="form-check mb-3"><input class="form-check-input" type="checkbox" value="" id="naoConformidadeCheckbox"><label class="form-check-label text-white" for="naoConformidadeCheckbox">Marcar como "Teve Não Conformidade"</label></div>
+                        <div class="mb-3" id="naoConformidadeDescricaoDiv" style="display: none;"><label for="naoConformidadeDescricao" class="form-label text-white-50">Descrição da Não Conformidade (Opcional)</label><textarea id="naoConformidadeDescricao" class="form-control form-control-glass" rows="3"></textarea></div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-warning">Salvar Status</button>
-                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-warning">Salvar Status</button></div>
                 </form>
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="scripts/projetos.js"></script>
 </body>
-
 </html>

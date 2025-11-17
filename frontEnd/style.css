@@ -76,12 +76,13 @@ body {
 /* ESTILOS DE FORMULÁRIO "GLASS" (Para Dashboard/Modais)   */
 /* ======================================================= */
 
+/* --- 2. Estilo Base para Inputs "Glass" --- */
 .form-control-glass, 
 .form-select-glass {
   background-color: rgba(0, 0, 0, 0.2) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: #fff !important; 
-  caret-color: #fff !important; 
+  color: #fff !important; /* Texto digitado fica branco */
+  caret-color: #fff !important; /* Cursor fica branco */
 }
 
 .form-control-glass::placeholder {
@@ -89,6 +90,7 @@ body {
   opacity: 1;
 }
 
+/* --- 3. Estilo em Foco (Clicado) --- */
 .form-control-glass:focus,
 .form-select-glass:focus {
   background-color: rgba(0, 0, 0, 0.2) !important;
@@ -98,6 +100,7 @@ body {
   caret-color: #fff !important; 
 }
 
+/* --- 4. Estilos dos componentes de texto (do seu CSS) --- */
 .form-select-glass {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
 }
@@ -155,49 +158,76 @@ select[multiple].form-select-glass option {
   padding: 5px 10px;
 }
 
-/* ... (scrollbars) ... */
+select[multiple].form-select-glass::-webkit-scrollbar {
+  width: 8px;
+}
+
+select[multiple].form-select-glass::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+select[multiple].form-select-glass::-webkit-scrollbar-thumb {
+  background-color: rgba(246, 245, 245, 0.826);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+select[multiple].form-select-glass {
+   scrollbar-width: thin;
+   scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1);
+}
 
 /* ============================================= */
 /* ESTILOS DA PÁGINA DE LOGIN (SEU NOVO CÓDIGO)  */
 /* ============================================= */
 
+/* Define o fundo e centraliza o conteúdo */
 body.login-page {
+    /* Garante que o gradiente escuro do body principal se aplique */
     background: linear-gradient(135deg, rgba(16, 19, 36, 1) 0%, rgba(32, 36, 63, 1) 50%, rgba(16, 19, 36, 1) 100%);
     background-attachment: fixed;
+    
+    /* Centraliza o card de login */
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh; 
+    min-height: 100vh; /* Garante altura total */
     padding: 20px;
     box-sizing: border-box;
 }
 
+/* Define o tamanho do container do formulário */
 .login-container {
     width: 100%;
     max-width: 480px;
     margin: auto;
 }
 
+/* Estilo "Glass" específico para o card de login/cadastro */
 .glass-card-login {
-    background: rgba(255, 255, 255, 0.05); 
-    backdrop-filter: blur(15px); 
+    background: rgba(255, 255, 255, 0.05); /* Mais translúcido */
+    backdrop-filter: blur(15px); /* Mais blur */
     -webkit-backdrop-filter: blur(15px);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.2); 
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); 
-    color: #fff; 
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Borda mais clara */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Sombra mais forte */
+    color: #fff; /* Texto padrão branco */
 }
 
+/* Cor do texto do placeholder (label flutuante) e ícones */
 .login-container .form-floating > label,
 .login-container .fas,
-.login-container .text-white-50 { 
+.login-container .text-white-50 { /* Torna o texto "Sistema de Gestão" mais claro */
     color: rgba(255, 255, 255, 0.75) !important;
 }
 
+/* Cor do texto do título */
 .login-container .text-white {
     color: #fff !important;
 }
 
+/* Cor dos links "Esqueceu a senha / Criar conta" */
 .login-container a {
     color: rgba(255, 255, 255, 0.75) !important;
     text-decoration: none;
@@ -212,12 +242,14 @@ body.login-page {
 /* AJUSTE PARA LABELS FLUTUANTES EM FUNDO BRANCO */
 /* ============================================= */
 
+/* Esta é a correção para os inputs brancos que estamos usando 
+   na tela de login. */
 .form-floating > .form-control:not(:placeholder-shown) ~ label {
-    color: #6c757d; 
+    color: #6c757d; /* Cor do label quando encolhido */
 }
 
 .form-floating > label {
-    color: #6c757d; 
+    color: #6c757d; /* Cor do label quando expandido */
 }
 
 /* ============================================= */
@@ -292,4 +324,25 @@ body.body-pdf-export .main-content {
 
 body.body-pdf-export #reportableContent {
     padding: 20px; /* Adiciona uma margem interna no PDF */
+}
+
+/* ============================================= */
+/* PAGINAÇÃO                                     */
+/* ============================================= */
+
+.page-link {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+}
+
+.page-link:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
+}
+
+.page-item.disabled .page-link {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
 }

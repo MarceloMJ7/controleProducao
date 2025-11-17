@@ -18,4 +18,10 @@ router.post("/login", userController.login);
 // URL final: GET /api/users/perfil
 router.get("/perfil", verificarToken, userController.getProfile);
 
+// Rota para ESQUECI SENHA
+router.post("/forgot-password", userController.forgotPassword);
+
+// Rota para REDEFINIR SENHA
+router.post("/reset-password", userController.resetPassword);
+
 module.exports = router;

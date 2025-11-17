@@ -17,6 +17,10 @@ model Usuario {
   email           String    @unique
   senha           String
 
+  // Campos para Recuperação de Senha (NOVOS)
+  resetToken      String?   // O código temporário
+  resetExpires    DateTime? // Até quando o código vale
+
   // Relação: Um usuário pode criar muitos projetos
   projetos        Projeto[] @relation("CriadoPor")
 }
