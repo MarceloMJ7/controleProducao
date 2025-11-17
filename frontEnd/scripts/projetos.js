@@ -8,6 +8,7 @@ import {
     confirmarAcao
 } from './common.js';
 
+// Variáveis de Paginação
 let currentPage = 1;
 const ITEMS_PER_PAGE = 10;
 
@@ -19,27 +20,32 @@ document.addEventListener("DOMContentLoaded", function () {
     if (tabelaProjetosCorpo) {
         const filtroNomeInput = document.getElementById("filtroNome");
         const filtroStatusSelect = document.getElementById("filtroStatus");
-        const urlParams = new URLSearchParams(window.location.search);
-        const codigoParaFiltrar = urlParams.get('codigo');
-        
-        if (codigoParaFiltrar && filtroNomeInput) filtroNomeInput.value = codigoParaFiltrar;
 
+        // Filtros
         if (filtroNomeInput && filtroStatusSelect) {
             filtroNomeInput.addEventListener("input", () => { currentPage = 1; carregarProjetos(); });
             filtroStatusSelect.addEventListener("change", () => { currentPage = 1; carregarProjetos(); });
         }
 
-        document.getElementById("paginacaoContainer").addEventListener("click", (e) => {
-            if (e.target.tagName === 'A' || e.target.closest('a')) {
-                e.preventDefault();
-                const btn = e.target.closest('a');
-                if (btn.dataset.page) {
-                    currentPage = parseInt(btn.dataset.page);
-                    carregarProjetos();
+        // Paginação
+        const paginacaoContainer = document.getElementById("paginacaoContainer");
+        if (paginacaoContainer) {
+            paginacaoContainer.addEventListener("click", (e) => {
+                if (e.target.tagName === 'A' || e.target.closest('a')) {
+                    e.preventDefault();
+                    const btn = e.target.closest('a');
+                    if (btn && !btn.parentElement.classList.contains('disabled')) {
+                        const newPage = parseInt(btn.dataset.page);
+                        if (!isNaN(newPage) && newPage > 0) {
+                            currentPage = newPage;
+                            carregarProjetos();
+                        }
+                    }
                 }
-            }
-        });
+            });
+        }
 
+        // Listener de Cliques na Tabela
         tabelaProjetosCorpo.addEventListener("click", async function (event) {
             const targetElement = event.target;
             const linhaClicada = targetElement.closest("tr");
@@ -63,6 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
             
+            // Detalhes (clique na linha)
             const detailsCard = document.getElementById("projectDetailsCard");
             if (detailsCard) {
                 document.getElementById("projectCodeDetail").innerText = `Detalhes do Projeto: ${linhaClicada.cells[0].textContent}`;
@@ -77,20 +84,20 @@ document.addEventListener("DOMContentLoaded", function () {
         setupModalNaoConformidade();
         setupModalAdicionarProjeto();
         setupModalEditarProjeto();
+        
+        // Inicialização
         carregarProjetos();
     }
 });
 
 async function carregarProjetos() {
-    const detailsCard = document.getElementById("projectDetailsCard");
-    if (detailsCard) detailsCard.classList.add("d-none");
     const token = localStorage.getItem("authToken"); if (!token) return;
-    
+    const tabela = document.getElementById("projetosTabela");
     const nome = document.getElementById("filtroNome").value;
     const status = document.getElementById("filtroStatus").value;
-    const tabela = document.getElementById("projetosTabela");
     
     let url = `${API_BASE_URL}/api/projects?page=${currentPage}&limit=${ITEMS_PER_PAGE}&nome=${encodeURIComponent(nome)}&status=${encodeURIComponent(status)}`;
+    
     tabela.innerHTML = `<tr><td colspan="6" class="text-center text-white-50">Carregando...</td></tr>`;
 
     try {
@@ -98,8 +105,23 @@ async function carregarProjetos() {
         if (!response.ok) throw new Error("Falha ao buscar projetos.");
         
         const resultado = await response.json();
-        const projetos = resultado.data;
-        const meta = resultado.meta;
+        
+        // --- PROTEÇÃO CONTRA FORMATO ERRADO ---
+        // Se o backend mandar { data: [...] }, usa .data. Se mandar [...], usa direto.
+        let projetos = [];
+        let meta = { total: 0, page: 1, totalPages: 1 };
+
+        if (resultado.data && Array.isArray(resultado.data)) {
+            projetos = resultado.data; // Formato novo (Paginado)
+            meta = resultado.meta;
+        } else if (Array.isArray(resultado)) {
+            projetos = resultado; // Formato antigo (Lista simples)
+            // Se vier formato antigo, assumimos que é tudo uma página só
+            meta = { total: projetos.length, page: 1, totalPages: 1 };
+        } else {
+            throw new Error("Formato de dados inválido recebido do servidor.");
+        }
+        // --------------------------------------
 
         tabela.innerHTML = "";
         if (projetos.length === 0) {
@@ -110,7 +132,7 @@ async function carregarProjetos() {
 
         projetos.forEach((projeto) => {
             const dataCadastro = new Date(projeto.data_cadastro).toLocaleDateString("pt-BR");
-            const dataEntrega = new Date(projeto.data_entrega).toLocaleDateString("pt-BR");
+            const dataEntrega = projeto.data_entrega ? new Date(projeto.data_entrega).toLocaleDateString("pt-BR") : "N/A";
             const nomesMontadores = projeto.montadores && projeto.montadores.length > 0 ? projeto.montadores.map(m => m.nome).join(', ') : "N/A";
             const badgeClass = getBadgeClass(projeto.status);
             const ncIcon = projeto.teveNaoConformidade ? '<i class="fas fa-exclamation-circle text-danger ms-1 small" title="Não Conforme"></i>' : '';
@@ -130,7 +152,8 @@ async function carregarProjetos() {
         atualizarPaginacao(meta);
 
     } catch (error) { 
-        tabela.innerHTML = `<tr><td colspan="6" class="text-center text-danger">${error.message}</td></tr>`; 
+        console.error(error);
+        tabela.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Erro: ${error.message}</td></tr>`; 
     }
 }
 
@@ -138,17 +161,19 @@ function atualizarPaginacao(meta) {
     const info = document.getElementById("paginacaoInfo");
     const container = document.getElementById("paginacaoContainer");
     
-    if (!info || !container) return;
+    if (info) info.textContent = `Página ${meta.page || 1} de ${meta.totalPages || 1} (Total: ${meta.total || 0})`;
+    if (container) {
+        container.innerHTML = '';
 
-    info.textContent = `Página ${meta.page} de ${meta.totalPages} (Total: ${meta.total})`;
-    container.innerHTML = '';
+        const prevDisabled = (meta.page <= 1) ? 'disabled' : '';
+        container.innerHTML += `<li class="page-item ${prevDisabled}"><a class="page-link bg-dark border-secondary text-white" href="#" data-page="${(meta.page || 1) - 1}">&laquo;</a></li>`;
 
-    const prevDisabled = meta.page === 1 ? 'disabled' : '';
-    container.innerHTML += `<li class="page-item ${prevDisabled}"><a class="page-link bg-dark border-secondary text-white" href="#" data-page="${meta.page - 1}">&laquo;</a></li>`;
-
-    const nextDisabled = meta.page === meta.totalPages || meta.totalPages === 0 ? 'disabled' : '';
-    container.innerHTML += `<li class="page-item ${nextDisabled}"><a class="page-link bg-dark border-secondary text-white" href="#" data-page="${meta.page + 1}">&raquo;</a></li>`;
+        const nextDisabled = (meta.page >= meta.totalPages) ? 'disabled' : '';
+        container.innerHTML += `<li class="page-item ${nextDisabled}"><a class="page-link bg-dark border-secondary text-white" href="#" data-page="${(meta.page || 1) + 1}">&raquo;</a></li>`;
+    }
 }
+
+// ... (Resto das funções: deletar, abrir modais, etc. Mantenha como estava) ...
 
 async function deletarProjeto(id) {
     const token = localStorage.getItem("authToken");
@@ -189,7 +214,7 @@ async function abrirModalDeEdicao(id) {
         document.getElementById("editStatus").value = projeto.status;
         document.getElementById("editDescricao").value = projeto.descricao;
         document.getElementById("editDataCadastro").value = new Date(projeto.data_cadastro).toISOString().split("T")[0];
-        document.getElementById("editDataEntrega").value = new Date(projeto.data_entrega).toISOString().split("T")[0];
+        document.getElementById("editDataEntrega").value = projeto.data_entrega ? new Date(projeto.data_entrega).toISOString().split("T")[0] : "";
         
         new bootstrap.Modal(document.getElementById("editProjectModal")).show();
     } catch (error) { exibirErro(error.message); }
