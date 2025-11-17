@@ -7,13 +7,13 @@ body {
   background: linear-gradient(135deg, rgba(16, 19, 36, 1) 0%, rgba(32, 36, 63, 1) 50%, rgba(16, 19, 36, 1) 100%);
   background-attachment: fixed;
   min-height: 100vh;
-  color: #f8f9fa; /* Define a cor do texto padrão como clara */
+  color: #f8f9fa;
 }
 
 /* --- Layout da Sidebar --- */
 .sidebar {
   width: 265px;
-  background-color: #212529 !important; /* Mantém a sidebar escura */
+  background-color: #212529 !important;
 }
 
 .main-content {
@@ -33,11 +33,11 @@ body {
 }
 
 .nav-pills .nav-link.active {
-  background-color: #0d6efd; /* Azul Padrão Bootstrap */
+  background-color: #0d6efd;
   color: #fff;
 }
 
-/* --- Componente Principal: Cartão de Vidro (Dashboard/Páginas) --- */
+/* --- Componente Principal: Cartão de Vidro --- */
 .glass-card {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
@@ -76,13 +76,13 @@ body {
 /* ESTILOS DE FORMULÁRIO "GLASS" (Para Dashboard/Modais)   */
 /* ======================================================= */
 
-/* --- 2. Estilo Base para Inputs "Glass" --- */
+/* --- Estilo Base para Inputs "Glass" --- */
 .form-control-glass, 
 .form-select-glass {
   background-color: rgba(0, 0, 0, 0.2) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: #fff !important; /* Texto digitado fica branco */
-  caret-color: #fff !important; /* Cursor fica branco */
+  color: #fff !important; 
+  caret-color: #fff !important; 
 }
 
 .form-control-glass::placeholder {
@@ -90,7 +90,7 @@ body {
   opacity: 1;
 }
 
-/* --- 3. Estilo em Foco (Clicado) --- */
+/* --- Estilo em Foco (Clicado) --- */
 .form-control-glass:focus,
 .form-select-glass:focus {
   background-color: rgba(0, 0, 0, 0.2) !important;
@@ -100,7 +100,20 @@ body {
   caret-color: #fff !important; 
 }
 
-/* --- 4. Estilos dos componentes de texto (do seu CSS) --- */
+/* --- CORREÇÃO DE AUTOFILL (LOGIN ESCURO) --- */
+/* Aqui está o segredo: usamos uma cor SÓLIDA (#23273a) parecida com o tema
+   para cobrir o branco forçado do navegador. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-text-fill-color: #ffffff !important; 
+    -webkit-box-shadow: 0 0 0 30px #23273a inset !important; /* Cor sólida escura */
+    caret-color: #fff !important; 
+    transition: background-color 5000s ease-in-out 0s; 
+}
+
+/* --- Estilos dos componentes de texto --- */
 .form-select-glass {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
 }
@@ -127,19 +140,6 @@ body {
 .modal-glass .modal-header, .modal-glass .modal-footer {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* ============================================= */
-/* AJUSTE DEFINITIVO ALINHAMENTO ÍCONE KPI       */
-/* ============================================= */
-
-#dashboard-page .card-body.d-flex {
-  align-items: center !important; 
-}
-
-#dashboard-page .col-lg-3:nth-child(4) .card-body i.fas { 
-  position: relative;
-  top: -2px; 
 }
 
 /* ============================================= */
@@ -179,55 +179,40 @@ select[multiple].form-select-glass {
 }
 
 /* ============================================= */
-/* ESTILOS DA PÁGINA DE LOGIN (SEU NOVO CÓDIGO)  */
+/* ESTILOS DA PÁGINA DE LOGIN                    */
 /* ============================================= */
 
-/* Define o fundo e centraliza o conteúdo */
 body.login-page {
-    /* Garante que o gradiente escuro do body principal se aplique */
     background: linear-gradient(135deg, rgba(16, 19, 36, 1) 0%, rgba(32, 36, 63, 1) 50%, rgba(16, 19, 36, 1) 100%);
     background-attachment: fixed;
-    
-    /* Centraliza o card de login */
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh; /* Garante altura total */
+    min-height: 100vh; 
     padding: 20px;
     box-sizing: border-box;
 }
 
-/* Define o tamanho do container do formulário */
 .login-container {
     width: 100%;
     max-width: 480px;
     margin: auto;
 }
 
-/* Estilo "Glass" específico para o card de login/cadastro */
 .glass-card-login {
-    background: rgba(255, 255, 255, 0.05); /* Mais translúcido */
-    backdrop-filter: blur(15px); /* Mais blur */
+    background: rgba(255, 255, 255, 0.05); 
+    backdrop-filter: blur(15px); 
     -webkit-backdrop-filter: blur(15px);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Borda mais clara */
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Sombra mais forte */
-    color: #fff; /* Texto padrão branco */
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); 
+    color: #fff; 
 }
 
-/* Cor do texto do placeholder (label flutuante) e ícones */
-.login-container .form-floating > label,
-.login-container .fas,
-.login-container .text-white-50 { /* Torna o texto "Sistema de Gestão" mais claro */
-    color: rgba(255, 255, 255, 0.75) !important;
-}
-
-/* Cor do texto do título */
 .login-container .text-white {
     color: #fff !important;
 }
 
-/* Cor dos links "Esqueceu a senha / Criar conta" */
 .login-container a {
     color: rgba(255, 255, 255, 0.75) !important;
     text-decoration: none;
@@ -239,29 +224,13 @@ body.login-page {
 }
 
 /* ============================================= */
-/* AJUSTE PARA LABELS FLUTUANTES EM FUNDO BRANCO */
+/* ESTILOS DE EXPORTAÇÃO PARA PDF                */
 /* ============================================= */
 
-/* Esta é a correção para os inputs brancos que estamos usando 
-   na tela de login. */
-.form-floating > .form-control:not(:placeholder-shown) ~ label {
-    color: #6c757d; /* Cor do label quando encolhido */
-}
-
-.form-floating > label {
-    color: #6c757d; /* Cor do label quando expandido */
-}
-
-/* ============================================= */
-/* ESTILOS DE EXPORTAÇÃO PARA PDF (NOVO)         */
-/* ============================================= */
-
-/* Quando o body tem esta classe, tudo fica "preto no branco" */
 body.body-pdf-export {
     background: #ffffff !important;
 }
 
-/* Converte os cards "glass" em cards brancos simples */
 body.body-pdf-export .glass-card,
 body.body-pdf-export .glass-card-login {
     background: #ffffff !important;
@@ -271,76 +240,46 @@ body.body-pdf-export .glass-card-login {
     box-shadow: none !important;
 }
 
-/* Força TODO o texto do relatório para preto */
 body.body-pdf-export #reportableContent,
-body.body-pdf-export #reportableContent h1,
-body.body-pdf-export #reportableContent h2,
-body.body-pdf-export #reportableContent h5,
-body.body-pdf-export #reportableContent p,
-body.body-pdf-export #reportableContent th,
-body.body-pdf-export #reportableContent td,
-body.body-pdf-export #reportableContent .badge,
-body.body-pdf-export #reportableContent strong,
-body.body-pdf-export #reportableContent .card-header,
-body.body-pdf-export #reportableContent #chartTitle,
-body.body-pdf-export #reportableContent .text-white,
-body.body-pdf-export #reportableContent .text-white-50 {
-    color: #212529 !important; /* Cor de texto escura padrão */
+body.body-pdf-export #reportableContent * {
+    color: #212529 !important; 
 }
 
-/* Força os badges a terem bordas escuras */
 body.body-pdf-export #reportableContent .badge {
     border-color: #6c757d !important;
     color: #212529 !important;
 }
-body.body-pdf-export #reportableContent .text-danger {
-    color: #dc3545 !important; /* Mantém o vermelho para N/C */
-}
-body.body-pdf-export #reportableContent .text-success {
-    color: #198754 !important; /* Mantém o verde */
-}
-body.body-pdf-export #reportableContent .text-primary {
-    color: #0d6efd !important; /* Mantém o azul */
-}
-body.body-pdf-export #reportableContent .text-warning {
-    color: #ffc107 !important; /* Mantém o amarelo */
-}
+body.body-pdf-export #reportableContent .text-danger { color: #dc3545 !important; }
+body.body-pdf-export #reportableContent .text-success { color: #198754 !important; }
+body.body-pdf-export #reportableContent .text-primary { color: #0d6efd !important; }
+body.body-pdf-export #reportableContent .text-warning { color: #ffc107 !important; }
 
-
-/* Oculta elementos que não queremos no PDF */
 body.body-pdf-export .sidebar,
 body.body-pdf-export #reportFilterCard,
 body.body-pdf-export #exportPdfButton {
     display: none !important;
 }
 
-/* Garante que a área de conteúdo ocupe a página toda */
 body.body-pdf-export .main-content {
     width: 100% !important;
     height: auto !important;
     overflow-y: visible !important;
     padding: 0 !important;
 }
-
-body.body-pdf-export #reportableContent {
-    padding: 20px; /* Adiciona uma margem interna no PDF */
-}
+body.body-pdf-export #reportableContent { padding: 20px; }
 
 /* ============================================= */
 /* PAGINAÇÃO                                     */
 /* ============================================= */
-
 .page-link {
     background-color: rgba(255, 255, 255, 0.05) !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
     color: #fff !important;
 }
-
 .page-link:hover {
     background-color: rgba(255, 255, 255, 0.2) !important;
     color: #fff !important;
 }
-
 .page-item.disabled .page-link {
     background-color: rgba(255, 255, 255, 0.02) !important;
     border-color: rgba(255, 255, 255, 0.05) !important;
