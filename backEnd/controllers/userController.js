@@ -155,3 +155,42 @@ exports.resetPassword = async (req, res) => {
         res.status(500).json({ message: "Erro ao redefinir senha." });
     }
 };
+
+// NOVA: Lógica para ATUALIZAR O PERFIL (Logado)
+exports.updateProfile = async (req, res) => {
+  const usuarioId = req.usuarioId; // Vem do token
+  const { nome, email, senhaAtual, novaSenha } = req.body;
+
+  try {
+      const usuario = await prisma.usuario.findUnique({ where: { id: usuarioId } });
+      if (!usuario) return res.status(404).json({ message: "Usuário não encontrado." });
+
+      const dadosParaAtualizar = { nome, email };
+
+      // Se o usuário quiser mudar a senha
+      if (novaSenha) {
+          if (!senhaAtual) {
+              return res.status(400).json({ message: "Para definir uma nova senha, informe a senha atual." });
+          }
+          const senhaValida = await bcrypt.compare(senhaAtual, usuario.senha);
+          if (!senhaValida) {
+              return res.status(401).json({ message: "A senha atual está incorreta." });
+          }
+          dadosParaAtualizar.senha = await bcrypt.hash(novaSenha, 10);
+      }
+
+      await prisma.usuario.update({
+          where: { id: usuarioId },
+          data: dadosParaAtualizar
+      });
+
+      res.status(200).json({ message: "Perfil atualizado com sucesso!" });
+
+  } catch (error) {
+      console.error("Erro ao atualizar perfil:", error);
+      if (error.code === 'P2002') {
+          return res.status(409).json({ message: "Este e-mail já está em uso." });
+      }
+      res.status(500).json({ message: "Erro ao atualizar perfil." });
+  }
+};

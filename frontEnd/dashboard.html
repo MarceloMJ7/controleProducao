@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,22 +10,34 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body id="dashboard-page">
 
     <main class="d-flex flex-nowrap">
         <div class="sidebar d-flex flex-column flex-shrink-0 p-3 text-bg-dark">
-            <a href="dashboard.html" class="d-flex align-items-center mb-3 text-white text-decoration-none"><i class="fas fa-cogs fa-2x me-2"></i><span class="fs-4 fw-bold">SGP</span></a><hr>
+            <a href="dashboard.html" class="d-flex align-items-center mb-3 text-white text-decoration-none"><i
+                    class="fas fa-cogs fa-2x me-2"></i><span class="fs-4 fw-bold">SGP</span></a>
+            <hr>
             <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item"><a href="dashboard.html" class="nav-link active" aria-current="page"><i class="fas fa-tachometer-alt fa-fw me-2"></i> Painel de Controle</a></li>
-                <li><a href="gerenciador_Projetos.html" class="nav-link"><i class="fas fa-project-diagram fa-fw me-2"></i> Projetos</a></li>
-                <li><a href="gerenciador_Montadores.html" class="nav-link"><i class="fas fa-users-cog fa-fw me-2"></i> Montadores</a></li>
-                <li><a href="relatorios.html" class="nav-link"><i class="fas fa-chart-pie fa-fw me-2"></i> Relatórios</a></li>
-            </ul><hr>
-            <div class="dropdown"><a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong id="nomeUsuarioLogado">Usuário</strong></a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                    {/* Botão de Sair com ID correto para o common.js */}
-                    <li><a class="dropdown-item" href="#" id="logoutButton">Sair</a></li>
-                </ul>
+                <li class="nav-item"><a href="dashboard.html" class="nav-link active" aria-current="page"><i
+                            class="fas fa-tachometer-alt fa-fw me-2"></i> Painel de Controle</a></li>
+                <li><a href="gerenciador_Projetos.html" class="nav-link"><i
+                            class="fas fa-project-diagram fa-fw me-2"></i> Projetos</a></li>
+                <li><a href="gerenciador_Montadores.html" class="nav-link"><i class="fas fa-users-cog fa-fw me-2"></i>
+                        Montadores</a></li>
+                <li><a href="relatorios.html" class="nav-link"><i class="fas fa-chart-pie fa-fw me-2"></i>
+                        Relatórios</a></li>
+            </ul>
+            <hr>
+            <div class="dropdown"><a href="#"
+                    class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle"
+                    data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong
+                        id="nomeUsuarioLogado">Usuário</strong></a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                            <li><a class="dropdown-item" href="perfil.html">Meu Perfil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutButton">Sair</a></li>
+                        </ul>
             </div>
         </div>
 
@@ -77,12 +90,14 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="row g-4 mt-3">
                 <div class="col-lg-7">
                     <div class="card glass-card h-100">
                         <div class="card-body">
-                            <h5 class="card-title text-white mb-3"> <i class="fas fa-exclamation-triangle me-2 text-warning"></i> Projetos que Exigem Atenção </h5>
+                            <h5 class="card-title text-white mb-3"> <i
+                                    class="fas fa-exclamation-triangle me-2 text-warning"></i> Projetos que Exigem
+                                Atenção </h5>
                             <ul id="listaProjetosAtencao" class="list-group list-group-flush">
                                 <li class="list-group-item text-center text-white-50">Carregando...</li>
                             </ul>
@@ -92,32 +107,40 @@
                 <div class="col-lg-5">
                     <div class="card glass-card h-100">
                         <div class="card-body">
-                            <h5 class="card-title text-white mb-3"><i class="fas fa-history me-2"></i> Últimas Atualizações</h5>
+                            <h5 class="card-title text-white mb-3"><i class="fas fa-history me-2"></i> Últimas
+                                Atualizações</h5>
                             <ul id="listaUltimasAtualizacoes" class="list-group list-group-flush">
-                                 <li class="list-group-item text-center text-white-50">Carregando...</li>
+                                <li class="list-group-item text-center text-white-50">Carregando...</li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <div class="row g-4 mt-3">
                 <div class="col-12">
-                     <div class="card glass-card">
-                         <div class="card-body">
-                             <h5 class="card-title text-white mb-3"><i class="fas fa-calendar-alt me-2"></i> Prazos de Entrega Próximos</h5>
-                             <div class="table-responsive">
-                                 <table class="table table-glass mb-0">
-                                     <thead>
-                                         <tr> <th>Projeto</th> <th>Empresa</th> <th class="text-end">Vencimento</th> </tr>
-                                     </thead>
-                                     <tbody id="tabelaPrazosBody">
-                                         <tr> <td colspan="3" class="text-center text-white-50">Carregando prazos...</td> </tr>
-                                     </tbody>
-                                 </table>
-                             </div>
-                         </div>
-                     </div>
+                    <div class="card glass-card">
+                        <div class="card-body">
+                            <h5 class="card-title text-white mb-3"><i class="fas fa-calendar-alt me-2"></i> Prazos de
+                                Entrega Próximos</h5>
+                            <div class="table-responsive">
+                                <table class="table table-glass mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Projeto</th>
+                                            <th>Empresa</th>
+                                            <th class="text-end">Vencimento</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabelaPrazosBody">
+                                        <tr>
+                                            <td colspan="3" class="text-center text-white-50">Carregando prazos...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -125,8 +148,9 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script type="module" src="scripts/dashboard.js"></script>
-    
+
 </body>
+
 </html>

@@ -18,6 +18,9 @@ router.post("/login", userController.login);
 // URL final: GET /api/users/perfil
 router.get("/perfil", verificarToken, userController.getProfile);
 
+// NOVA: Rota para ATUALIZAR PERFIL (PUT)
+router.put("/perfil", verificarToken, userController.updateProfile);
+
 // Rota para ESQUECI SENHA
 router.post("/forgot-password", userController.forgotPassword);
 

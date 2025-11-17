@@ -1,43 +1,58 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SGP - Relatórios</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
 
     <main class="d-flex flex-nowrap">
         <div class="sidebar d-flex flex-column flex-shrink-0 p-3 text-bg-dark">
-            <a href="dashboard.html" class="d-flex align-items-center mb-3 text-white text-decoration-none"><i class="fas fa-cogs fa-2x me-2"></i><span class="fs-4 fw-bold">SGP</span></a><hr>
+            <a href="dashboard.html" class="d-flex align-items-center mb-3 text-white text-decoration-none"><i
+                    class="fas fa-cogs fa-2x me-2"></i><span class="fs-4 fw-bold">SGP</span></a>
+            <hr>
             <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt fa-fw me-2"></i> Painel de Controle</a></li>
-                <li><a href="gerenciador_Projetos.html" class="nav-link"><i class="fas fa-project-diagram fa-fw me-2"></i> Projetos</a></li>
-                <li><a href="gerenciador_Montadores.html" class="nav-link"><i class="fas fa-users-cog fa-fw me-2"></i> Montadores</a></li>
-                <li><a href="relatorios.html" class="nav-link active" aria-current="page"><i class="fas fa-chart-pie fa-fw me-2"></i> Relatórios</a></li>
-            </ul><hr>
-            <div class="dropdown"><a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong id="nomeUsuarioLogado">Usuário</strong></a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                    <li><a class="dropdown-item" href="#" id="logoutButton">Sair</a></li>
-                </ul>
+                <li class="nav-item"><a href="dashboard.html" class="nav-link"><i
+                            class="fas fa-tachometer-alt fa-fw me-2"></i> Painel de Controle</a></li>
+                <li><a href="gerenciador_Projetos.html" class="nav-link"><i
+                            class="fas fa-project-diagram fa-fw me-2"></i> Projetos</a></li>
+                <li><a href="gerenciador_Montadores.html" class="nav-link"><i class="fas fa-users-cog fa-fw me-2"></i>
+                        Montadores</a></li>
+                <li><a href="relatorios.html" class="nav-link active" aria-current="page"><i
+                            class="fas fa-chart-pie fa-fw me-2"></i> Relatórios</a></li>
+            </ul>
+            <hr>
+            <div class="dropdown"><a href="#"
+                    class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle"
+                    data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong
+                        id="nomeUsuarioLogado">Usuário</strong></a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                            <li><a class="dropdown-item" href="perfil.html">Meu Perfil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutButton">Sair</a></li>
+                        </ul>
             </div>
         </div>
-        
+
         <div class="main-content p-4">
             <h1 class="h2 text-white mb-4">Relatórios de Produção</h1>
 
             <div class="card glass-card mb-4" id="reportFilterCard">
-                <div class="card-header fw-bold text-white border-bottom-0"><i class="fas fa-filter me-2"></i> Selecione os Filtros</div>
+                <div class="card-header fw-bold text-white border-bottom-0"><i class="fas fa-filter me-2"></i> Selecione
+                    os Filtros</div>
                 <div class="card-body">
                     <form class="row g-3 align-items-end" id="reportForm">
                         <div class="col-md-3">
@@ -51,19 +66,19 @@
                             <label for="startDate" class="form-label text-white-50">Período (De)</label>
                             <input type="date" class="form-control form-control-glass" id="startDate">
                         </div>
-                         <div class="col-md-3">
+                        <div class="col-md-3">
                             <label for="endDate" class="form-label text-white-50">Período (Até)</label>
                             <input type="date" class="form-control form-control-glass" id="endDate">
                         </div>
                         <div class="col-md-3" id="montadorFilter">
                             <label for="montadorSelect" class="form-label text-white-50">Montador</label>
                             <select id="montadorSelect" class="form-select form-select-glass">
-                                </select>
+                            </select>
                         </div>
                         <div class="col-md-3" id="statusFilter">
                             <label for="statusSelect" class="form-label text-white-50">Status do Projeto</label>
                             <select id="statusSelect" class="form-select form-select-glass">
-                                </select>
+                            </select>
                         </div>
                         <div class="col-md-3" id="naoConformidadeFilter">
                             <label for="naoConformidadeSelect" class="form-label text-white-50">Não Conformidade</label>
@@ -74,7 +89,8 @@
                             </select>
                         </div>
                         <div class="col-12 text-end">
-                            <button type="submit" class="btn btn-primary fw-bold px-4"><i class="fas fa-cogs me-2"></i> Gerar</button>
+                            <button type="submit" class="btn btn-primary fw-bold px-4"><i class="fas fa-cogs me-2"></i>
+                                Gerar</button>
                         </div>
                     </form>
                 </div>
@@ -83,11 +99,12 @@
             <div id="reportableContent">
                 <div id="visualResults" class="d-none">
                     <div class="row g-4 mb-4" id="kpiCardsRow">
-                        </div>
+                    </div>
                     <div class="row g-4 mb-4">
                         <div class="col-md-12">
                             <div class="card glass-card">
-                                 <div class="card-header fw-bold text-white border-bottom-0" id="chartTitle">Gráfico de Desempenho</div>
+                                <div class="card-header fw-bold text-white border-bottom-0" id="chartTitle">Gráfico de
+                                    Desempenho</div>
                                 <div class="card-body" style="height: 400px;">
                                     <canvas id="reportChart"></canvas>
                                 </div>
@@ -104,7 +121,10 @@
                         </button>
                     </div>
                     <div class="card-body">
-                        <div id="reportPlaceholder" class="text-center text-white-50 py-5"><i class="fas fa-hand-pointer fa-3x mb-3"></i><p>Preencha os filtros e clique em "Gerar".</p></div>
+                        <div id="reportPlaceholder" class="text-center text-white-50 py-5"><i
+                                class="fas fa-hand-pointer fa-3x mb-3"></i>
+                            <p>Preencha os filtros e clique em "Gerar".</p>
+                        </div>
                         <div id="reportResults" class="table-responsive d-none">
                             <table class="table table-hover table-glass">
                                 <thead id="reportTableHeader"></thead>
@@ -113,10 +133,12 @@
                         </div>
                     </div>
                 </div>
-            </div> </div>
+            </div>
+        </div>
     </main>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="scripts/relatorios.js"></script>
 </body>
+
 </html>
