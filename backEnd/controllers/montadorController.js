@@ -17,7 +17,7 @@ exports.createMontador = async (req, res) => {
   }
 };
 
-// --- LISTAR MONTADORES (COM PAGINAÇÃO) ---
+// --- LISTAR MONTADORES (OTIMIZADO) ---
 exports.getAllMontadores = async (req, res) => {
     const { nome, page = 1, limit = 10 } = req.query; 
     
@@ -25,9 +25,11 @@ exports.getAllMontadores = async (req, res) => {
     const p_limit = parseInt(limit);
     const skip = (p_page - 1) * p_limit;
 
+    // Datas para o filtro "Concluídos no Mês"
     const agora = new Date();
     const primeiroDiaMes = new Date(agora.getFullYear(), agora.getMonth(), 1);
-    const ultimoDiaMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0, 23, 59, 59);
+    const ultimoDiaMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0);
+    ultimoDiaMes.setHours(23, 59, 59, 999);
 
     try {
         const where = {};
@@ -35,10 +37,10 @@ exports.getAllMontadores = async (req, res) => {
             where.nome = { contains: nome, mode: 'insensitive' };
         }
 
-        // 1. Conta total
+        // 1. Conta total de montadores (para paginação)
         const total = await prisma.montador.count({ where: where });
 
-        // 2. Busca paginado
+        // 2. Busca apenas os dados básicos dos montadores da página atual
         const montadores = await prisma.montador.findMany({
             where: where,
             orderBy: { nome: 'asc' },
@@ -46,27 +48,31 @@ exports.getAllMontadores = async (req, res) => {
             take: p_limit
         });
 
-        // 3. Calcula estatísticas para esta página
+        // 3. Busca as estatísticas em paralelo (usando COUNT, muito mais rápido)
         const montadoresComStats = await Promise.all(
             montadores.map(async (montador) => {
-                const projetosAtivos = await prisma.projeto.count({
-                    where: {
-                        montadores: { some: { id: montador.id } },
-                        status: 'Em Montagem'
-                    }
-                });
-                const concluidosNoMes = await prisma.projeto.count({
-                    where: {
-                        montadores: { some: { id: montador.id } },
-                        status: 'Concluído',
-                        updatedAt: { gte: primeiroDiaMes, lte: ultimoDiaMes }
-                    }
-                });
+                // Executa as duas contagens em paralelo para este montador
+                const [projetosAtivos, concluidosNoMes] = await Promise.all([
+                    prisma.projeto.count({
+                        where: {
+                            montadores: { some: { id: montador.id } },
+                            status: 'Em Montagem'
+                        }
+                    }),
+                    prisma.projeto.count({
+                        where: {
+                            montadores: { some: { id: montador.id } },
+                            status: 'Concluído',
+                            updatedAt: { gte: primeiroDiaMes, lte: ultimoDiaMes }
+                        }
+                    })
+                ]);
+
                 return { ...montador, projetosAtivos, concluidosNoMes };
             })
         );
 
-        // 4. Retorna com metadados
+        // 4. Retorna
         res.status(200).json({
             data: montadoresComStats,
             meta: {

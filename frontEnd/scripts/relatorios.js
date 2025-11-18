@@ -1,3 +1,6 @@
+/* ============================================= */
+/* ARQUIVO: relatorios.js                        */
+/* ============================================= */
 import {
     API_BASE_URL,
     verificarAutenticacaoECarregarUsuario,
@@ -113,8 +116,9 @@ async function handleGerarRelatorio(e) {
 
 function renderKPIs(stats, type) {
     const row = document.getElementById('kpiCardsRow');
+    // CORREÇÃO DE ZOOM AQUI:
     const card = (t, v, i, c) => `
-        <div class="col-lg-3 col-md-6">
+        <div class="col-xxl-3 col-md-6">
             <div class="card glass-card h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div class="text-white"><h5 class="card-title opacity-75">${t}</h5><p class="card-text fs-2 fw-bold">${v}</p></div>
@@ -141,7 +145,6 @@ function renderKPIs(stats, type) {
 function renderizarGrafico(chartData) {
     if (currentReportChart) currentReportChart.destroy();
     const ctx = document.getElementById('reportChart').getContext('2d');
-    
     const colors = { azul: 'rgba(13, 110, 253, 0.7)', azulB: 'rgba(13, 110, 253, 1)', vermelho: 'rgba(220, 53, 69, 0.7)', vermelhoB: 'rgba(220, 53, 69, 1)', verde: 'rgba(25, 135, 84, 0.7)', amarelo: 'rgba(255, 206, 86, 0.7)' };
 
     let config = {
@@ -211,7 +214,6 @@ async function exportarPDF() {
 
     try {
         const canvas = await html2canvas(document.getElementById("reportableContent"), { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-        
         document.body.classList.remove('body-pdf-export');
         if (currentReportChart) { Chart.defaults.color = 'rgba(255,255,255,0.7)'; currentReportChart.update('none'); }
 

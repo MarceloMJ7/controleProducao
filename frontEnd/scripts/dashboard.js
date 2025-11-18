@@ -16,17 +16,22 @@ document.addEventListener("DOMContentLoaded", function () {
         carregarPrazosProximos();
     }
     
+    // --- Listener Corrigido para Redirecionamento ---
     document.body.addEventListener('click', function(event) {
         const verButton = event.target.closest('.btn-ver-projeto');
         if (verButton) {
             event.preventDefault();
             const codigoProjeto = verButton.dataset.projetoCodigo;
             if (codigoProjeto) {
-                window.location.href = `gerenciador_Projetos.html?codigo=${encodeURIComponent(codigoProjeto)}`;
+                // ALTERAÇÃO AQUI: Usa a rota limpa /projetos
+                window.location.href = `projetos?codigo=${encodeURIComponent(codigoProjeto)}`;
             }
         }
     });
 });
+
+// ... (Mantenha o restante das funções carregarEstatisticasDashboard, etc. iguais) ...
+// Vou incluir o resto do arquivo para garantir que você tenha o código completo e correto.
 
 async function carregarEstatisticasDashboard() {
     const token = localStorage.getItem("authToken"); if (!token) return;
@@ -37,7 +42,7 @@ async function carregarEstatisticasDashboard() {
     });
     try {
         const response = await fetch(`${API_BASE_URL}/api/dashboard/stats`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-cache' });
-        if (!response.ok) { throw new Error('Erro na API'); }
+        if (!response.ok) { throw new Error('Falha API'); }
         const stats = await response.json();
         const statsMap = {
             'statsProjetosAtivos': stats.emMontagem, 'statsProjetosPendentes': stats.pendentes,
@@ -48,8 +53,7 @@ async function carregarEstatisticasDashboard() {
             if (elemento) { elemento.textContent = statsMap[id] !== undefined ? statsMap[id] : 0; }
         });
     } catch (error) {
-        console.error("Erro stats:", error);
-        idsDosCards.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '!'; });
+        idsDosCards.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '-'; });
     }
 }
 

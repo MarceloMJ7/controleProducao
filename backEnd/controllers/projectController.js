@@ -37,11 +37,16 @@ exports.createProject = async (req, res) => {
     }
 };
 
-// --- ATUALIZAR PROJETO ---
+// --- ATUALIZAR PROJETO (CORRIGIDO) ---
 exports.updateProject = async (req, res) => {
     const { id } = req.params;
     const { codigo_projeto, nome_empresa, status, descricao, data_cadastro, data_entrega, montadorIds } = req.body;
     const usuarioId = req.usuarioId;
+
+    // Validação mais amigável
+    if (!data_entrega) {
+         return res.status(400).json({ message: "Data de entrega é obrigatória." });
+    }
 
     try {
         const projetoExistente = await prisma.projeto.findUnique({ where: { id: parseInt(id) } });
@@ -52,7 +57,7 @@ exports.updateProject = async (req, res) => {
         const data = {
             codigo_projeto, nome_empresa, status, descricao,
             data_cadastro: data_cadastro ? new Date(data_cadastro) : undefined,
-            data_entrega: data_entrega ? new Date(data_entrega) : undefined,
+            data_entrega: new Date(data_entrega), // Conversão direta pois já validamos que existe
             montadores: {}
         };
 
@@ -61,24 +66,24 @@ exports.updateProject = async (req, res) => {
             const validIds = montadorIds.map(id => parseInt(id)).filter(id => !isNaN(id));
             connectMontadores = validIds.map(id => ({ id: id }));
         }
+        // Usa set para substituir a lista de montadores
         data.montadores = { set: connectMontadores };
 
         const projetoAtualizado = await prisma.projeto.update({ where: { id: parseInt(id) }, data: data });
         res.status(200).json(projetoAtualizado);
 
     } catch (error) {
+        console.error("Erro update:", error); // Log para ajudar a debugar no servidor
         if (error.code === 'P2002') return res.status(409).json({ message: "Código duplicado." });
-        res.status(500).json({ message: "Erro interno." });
+        res.status(500).json({ message: "Erro ao atualizar projeto." });
     }
 };
 
-// --- LISTAR TODOS OS PROJETOS (COM PAGINAÇÃO) ---
+// --- LISTAR TODOS OS PROJETOS ---
 exports.getAllProjects = async (req, res) => {
-    // Lê os parâmetros de paginação da URL (ex: ?page=1&limit=10)
     const { nome, status, page = 1, limit = 10 } = req.query; 
     const usuarioId = req.usuarioId;
 
-    // Converte para inteiros (segurança)
     const p_page = parseInt(page);
     const p_limit = parseInt(limit);
     const skip = (p_page - 1) * p_limit; 
@@ -92,15 +97,10 @@ exports.getAllProjects = async (req, res) => {
                 { codigo_projeto: { contains: nome, mode: 'insensitive' } }
             ];
         }
+        if (status) where.status = status;
 
-        if (status) {
-            where.status = status;
-        }
-
-        // 1. Busca o Total de itens
         const total = await prisma.projeto.count({ where: where });
 
-        // 2. Busca os itens da página atual
         const projetos = await prisma.projeto.findMany({
             where: where,
             skip: skip,     
@@ -114,7 +114,6 @@ exports.getAllProjects = async (req, res) => {
             orderBy: { data_cadastro: 'desc' }
         });
 
-        // 3. Retorna no formato padronizado { data, meta }
         res.status(200).json({
             data: projetos,
             meta: {
@@ -126,12 +125,11 @@ exports.getAllProjects = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Erro ao listar projetos:", error);
         res.status(500).json({ message: "Erro interno ao buscar projetos." });
     }
 };
 
-// --- BUSCAR POR ID ---
+// --- OUTRAS FUNÇÕES (Manter igual) ---
 exports.getProjectById = async (req, res) => {
     const { id } = req.params;
     const usuarioId = req.usuarioId;
@@ -142,12 +140,9 @@ exports.getProjectById = async (req, res) => {
         });
         if (!projeto || projeto.criadoPorId !== usuarioId) return res.status(404).json({ message: "Não encontrado." });
         res.status(200).json(projeto);
-    } catch (error) {
-        res.status(500).json({ message: "Erro interno." });
-    }
+    } catch (error) { res.status(500).json({ message: "Erro interno." }); }
 };
 
-// --- DELETAR ---
 exports.deleteProject = async (req, res) => {
     const { id } = req.params;
     const usuarioId = req.usuarioId;
@@ -156,19 +151,17 @@ exports.deleteProject = async (req, res) => {
         if (!proj || proj.criadoPorId !== usuarioId) return res.status(404).json({ message: "Não encontrado." });
         await prisma.projeto.delete({ where: { id: parseInt(id) } });
         res.status(204).send();
-    } catch (error) {
-        res.status(500).json({ message: "Erro interno." });
-    }
+    } catch (error) { res.status(500).json({ message: "Erro interno." }); }
 };
 
-// --- MARCAR N/C ---
 exports.marcarNaoConformidade = async (req, res) => {
     const { id } = req.params;
     const { teveNaoConformidade, descricaoNaoConformidade } = req.body;
     const usuarioId = req.usuarioId;
 
     if (typeof teveNaoConformidade !== 'boolean') return res.status(400).json({ message: "Campo inválido." });
-    
+    const descFinal = teveNaoConformidade ? (descricaoNaoConformidade || null) : null;
+
     try {
         const projeto = await prisma.projeto.findUnique({
             where: { id: parseInt(id) },
@@ -176,20 +169,11 @@ exports.marcarNaoConformidade = async (req, res) => {
         });
 
         if (!projeto || projeto.criadoPorId !== usuarioId) return res.status(404).json({ message: "Não encontrado." });
-        
-        // Regra de negócio: N/C apenas em concluídos? (Opcional, mas recomendado)
-        // if (projeto.status !== 'Concluído' && teveNaoConformidade === true) return res.status(400).json({ message: "Apenas projetos concluídos." });
 
         const atualizado = await prisma.projeto.update({
             where: { id: parseInt(id) },
-            data: { 
-                teveNaoConformidade: teveNaoConformidade, 
-                descricaoNaoConformidade: teveNaoConformidade ? (descricaoNaoConformidade || null) : null 
-            }
+            data: { teveNaoConformidade: teveNaoConformidade, descricaoNaoConformidade: descFinal }
         });
         res.status(200).json({ message: "Atualizado.", projeto: atualizado });
-
-    } catch (error) {
-        res.status(500).json({ message: "Erro interno." });
-    }
+    } catch (error) { res.status(500).json({ message: "Erro interno." }); }
 };

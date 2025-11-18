@@ -3,39 +3,62 @@
 /* ============================================= */
 
 body {
-  /* Fundo ATUALIZADO para um gradiente mais escuro e azulado */
   background: linear-gradient(135deg, rgba(16, 19, 36, 1) 0%, rgba(32, 36, 63, 1) 50%, rgba(16, 19, 36, 1) 100%);
   background-attachment: fixed;
   min-height: 100vh;
   color: #f8f9fa;
 }
 
-/* --- Layout da Sidebar --- */
+/* --- Layout da Sidebar (ATUALIZADO) --- */
 .sidebar {
   width: 265px;
+  min-width: 265px; /* Garante largura fixa */
   background-color: #212529 !important;
+  transition: all 0.3s ease; /* Animação suave */
+  overflow-x: hidden; /* Esconde conteúdo ao recolher */
+}
+
+/* Classe para ocultar a sidebar */
+.sidebar.toggled {
+  margin-left: -265px;
+}
+
+/* Botão de Menu Hambúrguer */
+#menu-toggle {
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.2s;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-right: 15px;
+}
+#menu-toggle:hover { color: #fff; }
+
+/* Responsividade para Celular */
+@media (max-width: 768px) {
+    .sidebar {
+        margin-left: -265px; /* Começa escondida no celular */
+        position: absolute;
+        height: 100%;
+        z-index: 1000;
+    }
+    .sidebar.toggled {
+        margin-left: 0; /* Aparece quando ativa */
+    }
 }
 
 .main-content {
   flex-grow: 1;
   height: 100vh;
   overflow-y: auto;
+  width: 100%; /* Garante que ocupe o espaço todo */
 }
 
 /* --- Estilos da Navegação na Sidebar --- */
-.nav-pills .nav-link {
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.nav-pills .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.nav-pills .nav-link.active {
-  background-color: #0d6efd;
-  color: #fff;
-}
+.nav-pills .nav-link { color: rgba(255, 255, 255, 0.75); }
+.nav-pills .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: #fff; }
+.nav-pills .nav-link.active { background-color: #0d6efd; color: #fff; }
 
 /* --- Componente Principal: Cartão de Vidro --- */
 .glass-card {
@@ -50,49 +73,33 @@ body {
 /* ============================================= */
 /* CORREÇÃO PARA LISTAS E TABELAS                */
 /* ============================================= */
-
 .glass-card .list-group-item {
      background-color: transparent !important;
      border-color: rgba(255, 255, 255, 0.15) !important;
      color: #f8f9fa;
  }
-
-.table-glass {
-  color: #f8f9fa;
-}
-
+.table-glass { color: #f8f9fa; }
 .table-glass th, .table-glass td {
   color: #f8f9fa;
   border-color: rgba(255, 255, 255, 0.15);
   background-color: transparent !important; 
 }
-
 .table-glass tbody tr:hover {
   background-color: rgba(255, 255, 255, 0.1) !important;
   cursor: pointer;
 }
 
 /* ======================================================= */
-/* ESTILOS DE FORMULÁRIO "GLASS" (Para Dashboard/Modais)   */
+/* ESTILOS DE FORMULÁRIO "GLASS"                           */
 /* ======================================================= */
-
-/* --- Estilo Base para Inputs "Glass" --- */
-.form-control-glass, 
-.form-select-glass {
+.form-control-glass, .form-select-glass {
   background-color: rgba(0, 0, 0, 0.2) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: #fff !important; 
   caret-color: #fff !important; 
 }
-
-.form-control-glass::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-  opacity: 1;
-}
-
-/* --- Estilo em Foco (Clicado) --- */
-.form-control-glass:focus,
-.form-select-glass:focus {
+.form-control-glass::placeholder { color: rgba(255, 255, 255, 0.6); opacity: 1; }
+.form-control-glass:focus, .form-select-glass:focus {
   background-color: rgba(0, 0, 0, 0.2) !important;
   border-color: rgba(255, 255, 255, 0.5) !important;
   box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.15) !important;
@@ -100,188 +107,91 @@ body {
   caret-color: #fff !important; 
 }
 
-/* --- CORREÇÃO DE AUTOFILL (LOGIN ESCURO) --- */
-/* Aqui está o segredo: usamos uma cor SÓLIDA (#23273a) parecida com o tema
-   para cobrir o branco forçado do navegador. */
+/* Correção Autofill (Login Escuro) */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active {
     -webkit-text-fill-color: #ffffff !important; 
-    -webkit-box-shadow: 0 0 0 30px #23273a inset !important; /* Cor sólida escura */
+    -webkit-box-shadow: 0 0 0 30px #23273a inset !important; 
     caret-color: #fff !important; 
     transition: background-color 5000s ease-in-out 0s; 
 }
 
-/* --- Estilos dos componentes de texto --- */
 .form-select-glass {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
 }
-
 .input-group-text-glass {
   background-color: rgba(0, 0, 0, 0.2) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
-/* --- Estilos para o Modal de Vidro --- */
+/* --- Modal de Vidro --- */
 .modal-glass {
   background: rgba(33, 37, 41, 0.6);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
-
 .modal-glass .modal-content {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
-
 .modal-glass .modal-header, .modal-glass .modal-footer {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ============================================= */
-/* MELHORIAS VISUAIS PARA SELECT MULTIPLE        */
-/* ============================================= */
+/* Ajuste Ícone KPI */
+#dashboard-page .card-body.d-flex { align-items: center !important; }
+#dashboard-page .col-xl-3:nth-child(4) .card-body i.fas { position: relative; top: -2px; }
 
-select[multiple].form-select-glass {
-  background-color: rgba(0, 0, 0, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: #fff !important;
-}
-
-select[multiple].form-select-glass option {
-  background-color: #343a40;
-  color: #f8f9fa;
-  padding: 5px 10px;
-}
-
-select[multiple].form-select-glass::-webkit-scrollbar {
-  width: 8px;
-}
-
-select[multiple].form-select-glass::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-}
-
-select[multiple].form-select-glass::-webkit-scrollbar-thumb {
-  background-color: rgba(246, 245, 245, 0.826);
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-select[multiple].form-select-glass {
-   scrollbar-width: thin;
-   scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1);
-}
+/* Select Multiple */
+select[multiple].form-select-glass { background-color: rgba(0, 0, 0, 0.2) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; color: #fff !important; }
+select[multiple].form-select-glass option { background-color: #343a40; color: #f8f9fa; padding: 5px 10px; }
+select[multiple].form-select-glass { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1); }
 
 /* ============================================= */
 /* ESTILOS DA PÁGINA DE LOGIN                    */
 /* ============================================= */
-
 body.login-page {
     background: linear-gradient(135deg, rgba(16, 19, 36, 1) 0%, rgba(32, 36, 63, 1) 50%, rgba(16, 19, 36, 1) 100%);
     background-attachment: fixed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh; 
-    padding: 20px;
-    box-sizing: border-box;
+    display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; box-sizing: border-box;
 }
-
-.login-container {
-    width: 100%;
-    max-width: 480px;
-    margin: auto;
-}
-
+.login-container { width: 100%; max-width: 480px; margin: auto; }
 .glass-card-login {
-    background: rgba(255, 255, 255, 0.05); 
-    backdrop-filter: blur(15px); 
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.2); 
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); 
-    color: #fff; 
+    background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); color: #fff; 
 }
+.login-container .text-white { color: #fff !important; }
+.login-container a { color: rgba(255, 255, 255, 0.75) !important; text-decoration: none; transition: all 0.2s ease; }
+.login-container a:hover { color: #fff !important; text-decoration: underline; }
 
-.login-container .text-white {
-    color: #fff !important;
-}
-
-.login-container a {
-    color: rgba(255, 255, 255, 0.75) !important;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-.login-container a:hover {
-    color: #fff !important;
-    text-decoration: underline;
-}
+/* Labels Flutuantes */
+.form-floating > .form-control:not(:placeholder-shown) ~ label { color: #6c757d; }
+.form-floating > label { color: #6c757d; }
 
 /* ============================================= */
 /* ESTILOS DE EXPORTAÇÃO PARA PDF                */
 /* ============================================= */
-
-body.body-pdf-export {
-    background: #ffffff !important;
+body.body-pdf-export { background: #ffffff !important; }
+body.body-pdf-export .glass-card, body.body-pdf-export .glass-card-login {
+    background: #ffffff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+    border: 1px solid #dee2e6 !important; box-shadow: none !important;
 }
-
-body.body-pdf-export .glass-card,
-body.body-pdf-export .glass-card-login {
-    background: #ffffff !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border: 1px solid #dee2e6 !important;
-    box-shadow: none !important;
-}
-
-body.body-pdf-export #reportableContent,
-body.body-pdf-export #reportableContent * {
-    color: #212529 !important; 
-}
-
-body.body-pdf-export #reportableContent .badge {
-    border-color: #6c757d !important;
-    color: #212529 !important;
-}
+body.body-pdf-export #reportableContent, body.body-pdf-export #reportableContent * { color: #212529 !important; }
+body.body-pdf-export #reportableContent .badge { border-color: #6c757d !important; color: #212529 !important; }
 body.body-pdf-export #reportableContent .text-danger { color: #dc3545 !important; }
 body.body-pdf-export #reportableContent .text-success { color: #198754 !important; }
 body.body-pdf-export #reportableContent .text-primary { color: #0d6efd !important; }
 body.body-pdf-export #reportableContent .text-warning { color: #ffc107 !important; }
-
-body.body-pdf-export .sidebar,
-body.body-pdf-export #reportFilterCard,
-body.body-pdf-export #exportPdfButton {
-    display: none !important;
-}
-
-body.body-pdf-export .main-content {
-    width: 100% !important;
-    height: auto !important;
-    overflow-y: visible !important;
-    padding: 0 !important;
-}
+body.body-pdf-export .sidebar, body.body-pdf-export #reportFilterCard, body.body-pdf-export #exportPdfButton, body.body-pdf-export #menu-toggle { display: none !important; }
+body.body-pdf-export .main-content { width: 100% !important; height: auto !important; overflow-y: visible !important; padding: 0 !important; }
 body.body-pdf-export #reportableContent { padding: 20px; }
 
-/* ============================================= */
-/* PAGINAÇÃO                                     */
-/* ============================================= */
-.page-link {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
-    color: #fff !important;
-}
-.page-link:hover {
-    background-color: rgba(255, 255, 255, 0.2) !important;
-    color: #fff !important;
-}
-.page-item.disabled .page-link {
-    background-color: rgba(255, 255, 255, 0.02) !important;
-    border-color: rgba(255, 255, 255, 0.05) !important;
-    color: rgba(255, 255, 255, 0.3) !important;
-}
+/* Paginação */
+.page-link { background-color: rgba(255, 255, 255, 0.05) !important; border-color: rgba(255, 255, 255, 0.1) !important; color: #fff !important; }
+.page-link:hover { background-color: rgba(255, 255, 255, 0.2) !important; color: #fff !important; }
+.page-item.disabled .page-link { background-color: rgba(255, 255, 255, 0.02) !important; border-color: rgba(255, 255, 255, 0.05) !important; color: rgba(255, 255, 255, 0.3) !important; }
