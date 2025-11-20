@@ -8,7 +8,6 @@ import {
     confirmarAcao
 } from './common.js';
 
-// Variáveis de Paginação
 let currentPage = 1;
 const ITEMS_PER_PAGE = 10;
 
@@ -20,37 +19,34 @@ document.addEventListener("DOMContentLoaded", function () {
     if (tabelaProjetosCorpo) {
         const filtroNomeInput = document.getElementById("filtroNome");
         const filtroStatusSelect = document.getElementById("filtroStatus");
+        
+        // Reset de filtros e paginação via URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const codigoParaFiltrar = urlParams.get('codigo');
+        if (codigoParaFiltrar && filtroNomeInput) filtroNomeInput.value = codigoParaFiltrar;
 
-        // Filtros
         if (filtroNomeInput && filtroStatusSelect) {
             filtroNomeInput.addEventListener("input", () => { currentPage = 1; carregarProjetos(); });
             filtroStatusSelect.addEventListener("change", () => { currentPage = 1; carregarProjetos(); });
         }
 
-        // Paginação
-        const paginacaoContainer = document.getElementById("paginacaoContainer");
-        if (paginacaoContainer) {
-            paginacaoContainer.addEventListener("click", (e) => {
-                if (e.target.tagName === 'A' || e.target.closest('a')) {
-                    e.preventDefault();
-                    const btn = e.target.closest('a');
-                    if (btn && !btn.parentElement.classList.contains('disabled')) {
-                        const newPage = parseInt(btn.dataset.page);
-                        if (!isNaN(newPage) && newPage > 0) {
-                            currentPage = newPage;
-                            carregarProjetos();
-                        }
-                    }
+        document.getElementById("paginacaoContainer").addEventListener("click", (e) => {
+            if (e.target.tagName === 'A' || e.target.closest('a')) {
+                e.preventDefault();
+                const btn = e.target.closest('a');
+                if (btn.dataset.page) {
+                    currentPage = parseInt(btn.dataset.page);
+                    carregarProjetos();
                 }
-            });
-        }
+            }
+        });
 
-        // Listener de Cliques na Tabela
         tabelaProjetosCorpo.addEventListener("click", async function (event) {
             const targetElement = event.target;
             const linhaClicada = targetElement.closest("tr");
             if (!linhaClicada || !linhaClicada.dataset.id) return;
-            const idDoProjeto = linhaClicada.dataset.id;
+            
+            const idDoProjeto = String(linhaClicada.dataset.id);
 
             if (targetElement.closest(".btn-nao-conformidade")) {
                 event.preventDefault();
@@ -69,7 +65,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
             
-            // Detalhes (clique na linha)
             const detailsCard = document.getElementById("projectDetailsCard");
             if (detailsCard) {
                 document.getElementById("projectCodeDetail").innerText = `Detalhes do Projeto: ${linhaClicada.cells[0].textContent}`;
@@ -84,20 +79,20 @@ document.addEventListener("DOMContentLoaded", function () {
         setupModalNaoConformidade();
         setupModalAdicionarProjeto();
         setupModalEditarProjeto();
-        
-        // Inicialização
         carregarProjetos();
     }
 });
 
 async function carregarProjetos() {
+    const detailsCard = document.getElementById("projectDetailsCard");
+    if (detailsCard) detailsCard.classList.add("d-none");
     const token = localStorage.getItem("authToken"); if (!token) return;
-    const tabela = document.getElementById("projetosTabela");
+    
     const nome = document.getElementById("filtroNome").value;
     const status = document.getElementById("filtroStatus").value;
+    const tabela = document.getElementById("projetosTabela");
     
     let url = `${API_BASE_URL}/api/projects?page=${currentPage}&limit=${ITEMS_PER_PAGE}&nome=${encodeURIComponent(nome)}&status=${encodeURIComponent(status)}`;
-    
     tabela.innerHTML = `<tr><td colspan="6" class="text-center text-white-50">Carregando...</td></tr>`;
 
     try {
@@ -106,22 +101,17 @@ async function carregarProjetos() {
         
         const resultado = await response.json();
         
-        // --- PROTEÇÃO CONTRA FORMATO ERRADO ---
-        // Se o backend mandar { data: [...] }, usa .data. Se mandar [...], usa direto.
         let projetos = [];
         let meta = { total: 0, page: 1, totalPages: 1 };
 
+        // Verifica se é o novo formato paginado ou o antigo
         if (resultado.data && Array.isArray(resultado.data)) {
-            projetos = resultado.data; // Formato novo (Paginado)
+            projetos = resultado.data; 
             meta = resultado.meta;
         } else if (Array.isArray(resultado)) {
-            projetos = resultado; // Formato antigo (Lista simples)
-            // Se vier formato antigo, assumimos que é tudo uma página só
+            projetos = resultado; 
             meta = { total: projetos.length, page: 1, totalPages: 1 };
-        } else {
-            throw new Error("Formato de dados inválido recebido do servidor.");
         }
-        // --------------------------------------
 
         tabela.innerHTML = "";
         if (projetos.length === 0) {
@@ -132,7 +122,7 @@ async function carregarProjetos() {
 
         projetos.forEach((projeto) => {
             const dataCadastro = new Date(projeto.data_cadastro).toLocaleDateString("pt-BR");
-            const dataEntrega = projeto.data_entrega ? new Date(projeto.data_entrega).toLocaleDateString("pt-BR") : "N/A";
+            const dataEntrega = new Date(projeto.data_entrega).toLocaleDateString("pt-BR");
             const nomesMontadores = projeto.montadores && projeto.montadores.length > 0 ? projeto.montadores.map(m => m.nome).join(', ') : "N/A";
             const badgeClass = getBadgeClass(projeto.status);
             const ncIcon = projeto.teveNaoConformidade ? '<i class="fas fa-exclamation-circle text-danger ms-1 small" title="Não Conforme"></i>' : '';
@@ -173,7 +163,7 @@ function atualizarPaginacao(meta) {
     }
 }
 
-// ... (Resto das funções: deletar, abrir modais, etc. Mantenha como estava) ...
+// ... Funções auxiliares ...
 
 async function deletarProjeto(id) {
     const token = localStorage.getItem("authToken");
@@ -186,27 +176,35 @@ async function deletarProjeto(id) {
     } catch (error) { exibirErro(error.message); }
 }
 
+// --- CORREÇÃO: LER O NOVO FORMATO DE DADOS DOS MONTADORES ---
 async function abrirModalDeEdicao(id) {
     try {
         const token = localStorage.getItem("authToken");
         const [projRes, montRes] = await Promise.all([
             fetch(`${API_BASE_URL}/api/projects/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
-            fetch(`${API_BASE_URL}/api/montadores`, { headers: { Authorization: `Bearer ${token}` } })
+            // Adicionado ?limit=1000 para garantir que trazemos todos os montadores para o dropdown
+            fetch(`${API_BASE_URL}/api/montadores?limit=1000`, { headers: { Authorization: `Bearer ${token}` } })
         ]);
         if (!projRes.ok || !montRes.ok) throw new Error("Erro ao buscar dados.");
         
         const projeto = await projRes.json();
-        const montadores = await montRes.json();
+        const montadoresResult = await montRes.json();
+        
+        // CORREÇÃO AQUI: Verifica se veio no formato paginado (.data) ou array simples
+        const listaMontadores = montadoresResult.data || montadoresResult;
+
         const select = document.getElementById("editMontadorResponsavel");
         select.innerHTML = "";
         const idsAtuais = projeto.montadores ? projeto.montadores.map(m => m.id) : [];
         
-        montadores.forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m.id; opt.textContent = m.nome;
-            if (idsAtuais.includes(m.id)) opt.selected = true;
-            select.appendChild(opt);
-        });
+        if (Array.isArray(listaMontadores)) {
+            listaMontadores.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.id; opt.textContent = m.nome;
+                if (idsAtuais.includes(m.id)) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
 
         document.getElementById("editProjectId").value = projeto.id;
         document.getElementById("editNomeEmpresa").value = projeto.nome_empresa;
@@ -214,24 +212,36 @@ async function abrirModalDeEdicao(id) {
         document.getElementById("editStatus").value = projeto.status;
         document.getElementById("editDescricao").value = projeto.descricao;
         document.getElementById("editDataCadastro").value = new Date(projeto.data_cadastro).toISOString().split("T")[0];
-        document.getElementById("editDataEntrega").value = projeto.data_entrega ? new Date(projeto.data_entrega).toISOString().split("T")[0] : "";
+        document.getElementById("editDataEntrega").value = new Date(projeto.data_entrega).toISOString().split("T")[0];
         
         new bootstrap.Modal(document.getElementById("editProjectModal")).show();
-    } catch (error) { exibirErro(error.message); }
+    } catch (error) { 
+        console.error(error);
+        exibirErro(error.message); 
+    }
 }
 
+// --- CORREÇÃO TAMBÉM AQUI: MODAL DE ADICIONAR ---
 function setupModalAdicionarProjeto() {
     const form = document.getElementById("addProjectForm");
     if (!form) return;
     
     document.getElementById("addProjectModal").addEventListener("show.bs.modal", async () => {
         const token = localStorage.getItem("authToken");
-        const res = await fetch(`${API_BASE_URL}/api/montadores`, { headers: { Authorization: `Bearer ${token}` } });
+        // Adicionado ?limit=1000 para trazer todos
+        const res = await fetch(`${API_BASE_URL}/api/montadores?limit=1000`, { headers: { Authorization: `Bearer ${token}` } });
         if(res.ok) {
-            const montadores = await res.json();
+            const montadoresResult = await res.json();
+            // CORREÇÃO AQUI: Trata formato paginado
+            const listaMontadores = montadoresResult.data || montadoresResult;
+
             const select = document.getElementById("montadorResponsavel");
             select.innerHTML = '';
-            montadores.forEach(m => select.innerHTML += `<option value="${m.id}">${m.nome}</option>`);
+            
+            if (Array.isArray(listaMontadores)) {
+                listaMontadores.forEach(m => select.innerHTML += `<option value="${m.id}">${m.nome}</option>`);
+            }
+            
             document.getElementById("dataCadastro").value = new Date().toISOString().split("T")[0];
         }
     });
@@ -239,13 +249,16 @@ function setupModalAdicionarProjeto() {
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const montadorIds = Array.from(document.getElementById("montadorResponsavel").selectedOptions).map(o => parseInt(o.value));
+        const data_entrega = document.getElementById("dataEntrega").value;
+        if (!data_entrega) { return exibirErro("A data de entrega é obrigatória."); }
+
         const data = {
             codigo_projeto: document.getElementById("codigoProjeto").value,
             nome_empresa: document.getElementById("nomeEmpresa").value,
             status: document.getElementById("statusInicial").value,
             descricao: document.getElementById("descricao").value,
             data_cadastro: document.getElementById("dataCadastro").value,
-            data_entrega: document.getElementById("dataEntrega").value,
+            data_entrega: data_entrega,
             montadorIds: montadorIds
         };
         try {
@@ -253,7 +266,7 @@ function setupModalAdicionarProjeto() {
                 method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("authToken")}` },
                 body: JSON.stringify(data)
             });
-            if (!res.ok) throw new Error("Erro ao criar projeto.");
+            if (!res.ok) { const erro = await res.json(); throw new Error(erro.message || "Erro ao criar projeto."); }
             exibirSucesso("Projeto criado!");
             bootstrap.Modal.getInstance(document.getElementById("addProjectModal")).hide();
             form.reset();
@@ -265,25 +278,40 @@ function setupModalAdicionarProjeto() {
 function setupModalEditarProjeto() {
     const form = document.getElementById("editProjectForm");
     if(!form) return;
+    
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const id = document.getElementById("editProjectId").value;
+        
+        const idInput = document.getElementById("editProjectId");
+        const id = idInput.value;
+        
+        if (!id || id === "undefined" || id === "NaN") {
+            return exibirErro("Erro interno: ID do projeto inválido. Tente recarregar a página.");
+        }
+
         const montadorIds = Array.from(document.getElementById("editMontadorResponsavel").selectedOptions).map(o => parseInt(o.value));
+        
+        const dataEntrega = document.getElementById("editDataEntrega").value;
+        if (!dataEntrega) {
+            return exibirErro("A data de entrega é obrigatória.");
+        }
+
         const data = {
             nome_empresa: document.getElementById("editNomeEmpresa").value,
             codigo_projeto: document.getElementById("editCodigoProjeto").value,
             status: document.getElementById("editStatus").value,
             descricao: document.getElementById("editDescricao").value,
             data_cadastro: document.getElementById("editDataCadastro").value,
-            data_entrega: document.getElementById("editDataEntrega").value,
+            data_entrega: dataEntrega,
             montadorIds: montadorIds
         };
+
         try {
             const res = await fetch(`${API_BASE_URL}/api/projects/${id}`, {
                 method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("authToken")}` },
                 body: JSON.stringify(data)
             });
-            if(!res.ok) throw new Error("Erro ao atualizar.");
+            if(!res.ok) { const erro = await res.json(); throw new Error(erro.message || "Erro ao atualizar."); }
             exibirSucesso("Projeto atualizado!");
             bootstrap.Modal.getInstance(document.getElementById("editProjectModal")).hide();
             carregarProjetos();

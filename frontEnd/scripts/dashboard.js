@@ -16,22 +16,19 @@ document.addEventListener("DOMContentLoaded", function () {
         carregarPrazosProximos();
     }
     
-    // --- Listener Corrigido para Redirecionamento ---
+    // Listener Corrigido para Redirecionamento (Funciona Local e Vercel)
     document.body.addEventListener('click', function(event) {
         const verButton = event.target.closest('.btn-ver-projeto');
         if (verButton) {
             event.preventDefault();
             const codigoProjeto = verButton.dataset.projetoCodigo;
             if (codigoProjeto) {
-                // ALTERAÇÃO AQUI: Usa a rota limpa /projetos
-                window.location.href = `projetos?codigo=${encodeURIComponent(codigoProjeto)}`;
+                // Apontando diretamente para o arquivo .html
+                window.location.href = `gerenciador_Projetos.html?codigo=${encodeURIComponent(codigoProjeto)}`;
             }
         }
     });
 });
-
-// ... (Mantenha o restante das funções carregarEstatisticasDashboard, etc. iguais) ...
-// Vou incluir o resto do arquivo para garantir que você tenha o código completo e correto.
 
 async function carregarEstatisticasDashboard() {
     const token = localStorage.getItem("authToken"); if (!token) return;
@@ -44,14 +41,17 @@ async function carregarEstatisticasDashboard() {
         const response = await fetch(`${API_BASE_URL}/api/dashboard/stats`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-cache' });
         if (!response.ok) { throw new Error('Falha API'); }
         const stats = await response.json();
-        const statsMap = {
-            'statsProjetosAtivos': stats.emMontagem, 'statsProjetosPendentes': stats.pendentes,
-            'statsProjetosConcluidos': stats.concluidos, 'statsProjetosMes': stats.projetosMes
-        };
-        idsDosCards.forEach(id => {
-            const elemento = document.getElementById(id);
-            if (elemento) { elemento.textContent = statsMap[id] !== undefined ? statsMap[id] : 0; }
-        });
+        
+        const elAtivos = document.getElementById('statsProjetosAtivos');
+        const elPendentes = document.getElementById('statsProjetosPendentes');
+        const elConcluidos = document.getElementById('statsProjetosConcluidos');
+        const elMes = document.getElementById('statsProjetosMes');
+
+        if(elAtivos) elAtivos.textContent = stats.emMontagem || 0;
+        if(elPendentes) elPendentes.textContent = stats.pendentes || 0;
+        if(elConcluidos) elConcluidos.textContent = stats.concluidos || 0;
+        if(elMes) elMes.textContent = stats.projetosMes || 0;
+
     } catch (error) {
         idsDosCards.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '-'; });
     }

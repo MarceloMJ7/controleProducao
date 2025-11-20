@@ -37,15 +37,15 @@ exports.createProject = async (req, res) => {
     }
 };
 
-// --- ATUALIZAR PROJETO (CORRIGIDO) ---
+// --- ATUALIZAR PROJETO (CORRIGIDO - ÚNICA VERSÃO) ---
 exports.updateProject = async (req, res) => {
     const { id } = req.params;
     const { codigo_projeto, nome_empresa, status, descricao, data_cadastro, data_entrega, montadorIds } = req.body;
     const usuarioId = req.usuarioId;
 
-    // Validação mais amigável
+    // Validação de segurança: Data de entrega é obrigatória no banco
     if (!data_entrega) {
-         return res.status(400).json({ message: "Data de entrega é obrigatória." });
+         return res.status(400).json({ message: "A data de entrega é obrigatória." });
     }
 
     try {
@@ -57,7 +57,7 @@ exports.updateProject = async (req, res) => {
         const data = {
             codigo_projeto, nome_empresa, status, descricao,
             data_cadastro: data_cadastro ? new Date(data_cadastro) : undefined,
-            data_entrega: new Date(data_entrega), // Conversão direta pois já validamos que existe
+            data_entrega: new Date(data_entrega), // Nunca será null aqui pois validamos acima
             montadores: {}
         };
 
@@ -66,16 +66,15 @@ exports.updateProject = async (req, res) => {
             const validIds = montadorIds.map(id => parseInt(id)).filter(id => !isNaN(id));
             connectMontadores = validIds.map(id => ({ id: id }));
         }
-        // Usa set para substituir a lista de montadores
         data.montadores = { set: connectMontadores };
 
         const projetoAtualizado = await prisma.projeto.update({ where: { id: parseInt(id) }, data: data });
         res.status(200).json(projetoAtualizado);
 
     } catch (error) {
-        console.error("Erro update:", error); // Log para ajudar a debugar no servidor
+        console.error("Erro update:", error);
         if (error.code === 'P2002') return res.status(409).json({ message: "Código duplicado." });
-        res.status(500).json({ message: "Erro ao atualizar projeto." });
+        res.status(500).json({ message: "Erro interno ao atualizar." });
     }
 };
 
@@ -129,7 +128,7 @@ exports.getAllProjects = async (req, res) => {
     }
 };
 
-// --- OUTRAS FUNÇÕES (Manter igual) ---
+// --- OUTRAS FUNÇÕES ---
 exports.getProjectById = async (req, res) => {
     const { id } = req.params;
     const usuarioId = req.usuarioId;
