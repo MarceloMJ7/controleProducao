@@ -103,7 +103,17 @@ async function carregarMontadores() {
 
     tabela.innerHTML = "";
     if (data.length === 0) {
-      tabela.innerHTML = `<tr><td colspan="5" class="text-center text-white-50">Nenhum montador encontrado.</td></tr>`;
+      // --- NOVO VISUAL DE ESTADO VAZIO ---
+      tabela.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <div class="text-white-50">
+                            <i class="fas fa-users-slash fa-3x mb-3 opacity-50"></i>
+                            <h5 class="fw-normal">Nenhum montador encontrado</h5>
+                            <p class="small mb-0">Cadastre um novo montador para começar.</p>
+                        </div>
+                    </td>
+                </tr>`;
       atualizarPaginacao(meta);
       return;
     }

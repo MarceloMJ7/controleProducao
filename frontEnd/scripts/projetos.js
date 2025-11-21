@@ -147,7 +147,17 @@ async function carregarProjetos() {
 
     tabela.innerHTML = "";
     if (projetos.length === 0) {
-      tabela.innerHTML = `<tr><td colspan="6" class="text-center text-white-50">Nenhum projeto encontrado.</td></tr>`;
+      // --- NOVO VISUAL DE ESTADO VAZIO ---
+      tabela.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <div class="text-white-50">
+                            <i class="fas fa-folder-open fa-3x mb-3 opacity-50"></i>
+                            <h5 class="fw-normal">Nenhum projeto encontrado</h5>
+                            <p class="small mb-0">Tente ajustar os filtros ou crie um novo projeto.</p>
+                        </div>
+                    </td>
+                </tr>`;
       atualizarPaginacao(meta);
       return;
     }
