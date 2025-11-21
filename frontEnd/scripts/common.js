@@ -1,28 +1,27 @@
 /* ============================================= */
 /* ARQUIVO: common.js                            */
-/* (Código partilhado por todas as páginas)      */
 /* ============================================= */
 
-// --- 1. Configuração Automática da API (NOVO) ---
-// Se o navegador estiver rodando em 'localhost' ou '127.0.0.1', usa a porta 3001.
-// Caso contrário (ex: vercel.app), usa o backend do Render.
+// Configuração Automática da API
+const hostname = window.location.hostname;
 export const API_BASE_URL =
-  window.location.hostname === "localhost" ||
-  window.location.hostname === "127.0.0.1"
+  hostname === "localhost" || hostname === "127.0.0.1"
     ? "http://localhost:3001"
     : "https://controleproducao.onrender.com";
 
-// --- 2. Lógica de Autenticação e Dados do Usuário ---
-
+// --- Lógica de Autenticação ---
 export async function verificarAutenticacaoECarregarUsuario() {
-  const paginasDeAcesso = ["login.html", "cadastro.html", "esqueci-senha.html"];
+  // "cadastro.html" REMOVIDO DAQUI (Agora é página interna)
+  const paginasPublicas = [
+    "login.html",
+    "esqueci-senha.html",
+    "redefinirSenha.html",
+  ];
   const paginaAtual = window.location.pathname.split("/").pop();
   const token = localStorage.getItem("authToken");
 
-  if (paginasDeAcesso.includes(paginaAtual) || paginaAtual === "") {
-    if (token) {
-      window.location.href = "dashboard.html";
-    }
+  if (paginasPublicas.includes(paginaAtual) || paginaAtual === "") {
+    if (token) window.location.href = "dashboard.html";
     return;
   }
 
@@ -48,9 +47,23 @@ export async function verificarAutenticacaoECarregarUsuario() {
       window.location.href = "login.html";
     }
   } catch (error) {
-    console.error("Erro ao buscar dados do usuário:", error);
     localStorage.removeItem("authToken");
     window.location.href = "login.html";
+  }
+}
+
+// --- Interface (Sidebar & Logout) ---
+function setupSidebarToggle() {
+  const btn = document.getElementById("menu-toggle");
+  const sidebar = document.querySelector(".sidebar");
+
+  if (btn && sidebar) {
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    newBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      sidebar.classList.toggle("toggled");
+    });
   }
 }
 
@@ -59,59 +72,27 @@ export function setupLogout() {
   if (logoutButton) {
     logoutButton.addEventListener("click", function (event) {
       event.preventDefault();
-
-      Swal.fire({
-        title: "Sair do Sistema?",
-        text: "Você terá que fazer login novamente.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Sim, sair",
-        cancelButtonText: "Cancelar",
-        background: "#212529",
-        color: "#fff",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          localStorage.removeItem("authToken");
-          window.location.href = "login.html";
+      confirmarAcao("Sair do Sistema?", "Terá de fazer login novamente.").then(
+        (confirmado) => {
+          if (confirmado) {
+            localStorage.removeItem("authToken");
+            window.location.href = "login.html";
+          }
         }
-      });
+      );
     });
   }
 }
 
-function setupSidebarToggle() {
-  const btn = document.getElementById("menu-toggle");
-  const sidebar = document.querySelector(".sidebar");
-
-  if (btn && sidebar) {
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      sidebar.classList.toggle("toggled");
-    });
-  }
-}
-
-// --- 3. Funções Utilitárias Partilhadas ---
-
+// --- Utilitários ---
 export function calcularTempoAtras(dataISO) {
   const agora = new Date();
   const dataPassada = new Date(dataISO);
-  const diferencaSegundos = Math.round((agora - dataPassada) / 1000);
-  const minutos = Math.round(diferencaSegundos / 60);
-  const horas = Math.round(diferencaSegundos / 3600);
-  const dias = Math.round(diferencaSegundos / 86400);
-
-  if (diferencaSegundos < 60) {
-    return `agora mesmo`;
-  } else if (minutos < 60) {
-    return `há ${minutos} min`;
-  } else if (horas < 24) {
-    return `há ${horas} h`;
-  } else {
-    return `há ${dias} d`;
-  }
+  const diferenca = Math.round((agora - dataPassada) / 1000);
+  if (diferenca < 60) return `agora mesmo`;
+  if (diferenca < 3600) return `há ${Math.round(diferenca / 60)} min`;
+  if (diferenca < 86400) return `há ${Math.round(diferenca / 3600)} h`;
+  return `há ${Math.round(diferenca / 86400)} d`;
 }
 
 export function getBadgeClass(status) {
@@ -127,8 +108,6 @@ export function getBadgeClass(status) {
   }
 }
 
-// --- 4. Utilitário de DEBOUNCE (NOVO) ---
-// Atrasa a execução de uma função (útil para barras de pesquisa)
 export function debounce(func, wait) {
   let timeout;
   return function (...args) {
@@ -138,11 +117,16 @@ export function debounce(func, wait) {
   };
 }
 
-// --- 5. Funções de Notificação (SweetAlert2) ---
-
-function getToast() {
+// --- Notificações (SweetAlert2) ---
+function getSwal() {
   if (typeof Swal === "undefined") return null;
-  return Swal.mixin({
+  return Swal;
+}
+
+const Toast = () => {
+  const S = getSwal();
+  if (!S) return null;
+  return S.mixin({
     toast: true,
     position: "top-end",
     showConfirmButton: false,
@@ -151,27 +135,27 @@ function getToast() {
     background: "#212529",
     color: "#fff",
     didOpen: (toast) => {
-      toast.addEventListener("mouseenter", Swal.stopTimer);
-      toast.addEventListener("mouseleave", Swal.resumeTimer);
+      toast.addEventListener("mouseenter", S.stopTimer);
+      toast.addEventListener("mouseleave", S.resumeTimer);
     },
   });
-}
+};
 
-export function exibirSucesso(mensagem) {
-  const Toast = getToast();
-  if (Toast) Toast.fire({ icon: "success", title: mensagem });
-  else alert(mensagem);
+export function exibirSucesso(msg) {
+  const t = Toast();
+  if (t) t.fire({ icon: "success", title: msg });
+  else alert(msg);
 }
-
-export function exibirErro(mensagem) {
-  const Toast = getToast();
-  if (Toast) Toast.fire({ icon: "error", title: mensagem });
-  else alert(mensagem);
+export function exibirErro(msg) {
+  const t = Toast();
+  if (t) t.fire({ icon: "error", title: msg });
+  else alert(msg);
 }
 
 export async function confirmarAcao(titulo, texto) {
-  if (typeof Swal === "undefined") return confirm(titulo);
-  const result = await Swal.fire({
+  const S = getSwal();
+  if (!S) return confirm(titulo);
+  const result = await S.fire({
     title: titulo,
     text: texto,
     icon: "warning",

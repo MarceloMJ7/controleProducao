@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,26 +10,35 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <main class="d-flex flex-nowrap">
         <div class="sidebar d-flex flex-column flex-shrink-0 p-3 text-bg-dark">
-            <a href="dashboard.html" class="d-flex align-items-center mb-3 text-white text-decoration-none"><i class="fas fa-cogs fa-2x me-2"></i><span class="fs-4 fw-bold">SGP</span></a><hr>
+            <a href="dashboard.html" class="d-flex align-items-center mb-3 text-white text-decoration-none"><i class="fas fa-cogs fa-2x me-2"></i><span class="fs-4 fw-bold">SGP</span></a>
+            <hr>
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt fa-fw me-2"></i> Painel de Controle</a></li>
                 <li><a href="gerenciador_Projetos.html" class="nav-link"><i class="fas fa-project-diagram fa-fw me-2"></i> Projetos</a></li>
                 <li><a href="gerenciador_Montadores.html" class="nav-link"><i class="fas fa-users-cog fa-fw me-2"></i> Montadores</a></li>
                 <li><a href="relatorios.html" class="nav-link"><i class="fas fa-chart-pie fa-fw me-2"></i> Relatórios</a></li>
-            </ul><hr>
+            </ul>
+            <hr>
             <div class="dropdown"><a href="#" class="d-flex align-items-center justify-content-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-user-circle fa-lg me-2"></i><strong id="nomeUsuarioLogado">Usuário</strong></a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
                     <li><a class="dropdown-item active" href="perfil.html">Meu Perfil</a></li>
-                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="cadastro.html">Novo Usuário</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
                     <li><a class="dropdown-item" href="#" id="logoutButton">Sair</a></li>
                 </ul>
             </div>
         </div>
-        
+
         <div class="main-content p-4">
             <div class="d-flex align-items-center mb-4">
                 <button id="menu-toggle" class="btn btn-link text-white me-3"><i class="fas fa-bars fa-lg"></i></button>
@@ -49,7 +59,7 @@
 
                             <form id="perfilForm">
                                 <h5 class="text-white border-bottom border-secondary border-opacity-50 pb-2 mb-3">Dados Pessoais</h5>
-                                
+
                                 <div class="mb-3">
                                     <label for="nome" class="form-label text-white-50">Nome Completo</label>
                                     <input type="text" class="form-control form-control-glass" id="nome" required>
@@ -90,8 +100,9 @@
             </div>
         </div>
     </main>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="scripts/perfil.js"></script>
 </body>
+
 </html>
