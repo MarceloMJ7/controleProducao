@@ -4,61 +4,56 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 exports.getStats = async (req, res) => {
-    const usuarioId = req.usuarioId; // ID do usuário logado
+    const usuarioId = req.usuarioId;
 
-    // Obter o primeiro e último dia do mês atual
+    // Definição do intervalo do mês atual
     const agora = new Date();
     const primeiroDiaMes = new Date(agora.getFullYear(), agora.getMonth(), 1);
-    const ultimoDiaMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0); // O dia 0 do próximo mês é o último dia do mês atual
-    // Ajustar o último dia para o final do dia (23:59:59.999) para incluir tudo
+    const ultimoDiaMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0);
     ultimoDiaMes.setHours(23, 59, 59, 999);
 
-
     try {
-        // Usar Promise.all para executar as contagens em paralelo
-        const [
-            // Contagem de projetos por status (como antes)
-            projetosPorStatus,
-            // NOVA Contagem: Projetos cadastrados no mês atual
-            projetosCadastradosMes
-        ] = await Promise.all([
-            // Agrupa e conta os projetos por status
-            prisma.projeto.groupBy({
-                by: ['status'],
-                where: { criadoPorId: usuarioId },
-                _count: { status: true }
+        const [pendentes, emMontagem, concluidosMes, projetosCadastradosMes] = await Promise.all([
+            
+            // 1. Pendentes (Total Geral - Estoque)
+            // Mantém geral para nenhum serviço antigo ficar esquecido na fila.
+            prisma.projeto.count({
+                where: { criadoPorId: usuarioId, status: 'Pendente' }
             }),
-            // Conta projetos criados entre o primeiro e último dia do mês atual
+
+            // 2. Em Montagem (Total Geral - Carga de Trabalho)
+            // Mantém geral para mostrar o volume real de trabalho na oficina hoje.
+            prisma.projeto.count({
+                where: { criadoPorId: usuarioId, status: 'Em Montagem' }
+            }),
+
+            // 3. Concluídos (MÊS ATUAL - Produtividade) [CORRIGIDO]
+            // Filtra pela data de atualização (quando foi concluído) dentro deste mês.
             prisma.projeto.count({
                 where: {
                     criadoPorId: usuarioId,
-                    data_cadastro: {
-                        gte: primeiroDiaMes, // Maior ou igual ao primeiro dia
-                        lte: ultimoDiaMes    // Menor ou igual ao último dia (com hora ajustada)
-                    }
+                    status: 'Concluído',
+                    updatedAt: { gte: primeiroDiaMes, lte: ultimoDiaMes }
+                }
+            }),
+
+            // 4. Cadastrados (Mês Atual - Entradas)
+            prisma.projeto.count({
+                where: {
+                    criadoPorId: usuarioId,
+                    data_cadastro: { gte: primeiroDiaMes, lte: ultimoDiaMes }
                 }
             })
-            // REMOVEMOS a contagem de prisma.montador.count() daqui
         ]);
 
-        // Formata os dados para a resposta da API
         const stats = {
-            // totalProjetos: // Removido por simplicidade, mas pode ser adicionado se necessário
-            projetosMes: projetosCadastradosMes, // NOVA métrica
-            pendentes: 0,
-            emMontagem: 0,
-            concluidos: 0
-            // totalMontadores: // REMOVIDO
+            projetosMes: projetosCadastradosMes, // Entradas
+            pendentes: pendentes,                // Fila
+            emMontagem: emMontagem,              // Em Andamento
+            concluidos: concluidosMes            // Saídas (Meta do Mês)
         };
 
-        // Preenche as contagens por status
-        projetosPorStatus.forEach(item => {
-            if (item.status === 'Pendente') stats.pendentes = item._count.status;
-            if (item.status === 'Em Montagem') stats.emMontagem = item._count.status;
-            if (item.status === 'Concluído') stats.concluidos = item._count.status;
-        });
-
-        res.status(200).json(stats); // Retorna o objeto JSON com as estatísticas atualizadas
+        res.status(200).json(stats);
 
     } catch (error) {
         console.error("Erro ao buscar estatísticas do dashboard:", error);
@@ -66,123 +61,62 @@ exports.getStats = async (req, res) => {
     }
 };
 
-// backend/controllers/dashboardController.js
-// ... (a função getStats continua aqui em cima)
-
-// NOVA FUNÇÃO para buscar projetos que exigem atenção
+// --- AS OUTRAS FUNÇÕES (Atencao, Atualizacoes, Prazos) PERMANECEM IGUAIS ---
 exports.getProjetosAtencao = async (req, res) => {
     const usuarioId = req.usuarioId;
     const hoje = new Date();
-
     try {
         const projetosAtrasados = await prisma.projeto.findMany({
             where: {
                 criadoPorId: usuarioId,
-                status: {
-                    not: 'Concluído'
-                },
-                data_entrega: {
-                    lt: hoje
-                }
+                status: { not: 'Concluído' },
+                data_entrega: { lt: hoje }
             },
-            select: { // Seleciona campos necessários
-                id: true,
-                codigo_projeto: true,
-                nome_empresa: true, // <-- ADICIONE ESTA LINHA
-                status: true,
-                data_entrega: true,
-                descricao: true
+            select: {
+                id: true, codigo_projeto: true, nome_empresa: true,
+                status: true, data_entrega: true, descricao: true
             },
-            orderBy: {
-                data_entrega: 'asc'
-            },
+            orderBy: { data_entrega: 'asc' },
             take: 5
         });
-
-        // Adiciona o tipo de atenção
-        const resultado = projetosAtrasados.map(p => ({
-            ...p,
-            tipo_atencao: 'Atrasado'
-        }));
-
+        const resultado = projetosAtrasados.map(p => ({ ...p, tipo_atencao: 'Atrasado' }));
         res.status(200).json(resultado);
-
-    } catch (error) {
-        console.error("Erro ao buscar projetos que exigem atenção:", error);
-        res.status(500).json({ message: "Erro ao buscar projetos com atenção." });
-    }
+    } catch (error) { res.status(500).json({ message: "Erro ao buscar projetos." }); }
 };
 
-// NOVA FUNÇÃO para buscar as últimas atualizações (projetos recentes)
 exports.getUltimasAtualizacoes = async (req, res) => {
     const usuarioId = req.usuarioId;
-
     try {
         const projetosRecentes = await prisma.projeto.findMany({
-            where: {
-                criadoPorId: usuarioId
+            where: { criadoPorId: usuarioId },
+            select: {
+                id: true, codigo_projeto: true, nome_empresa: true,
+                status: true, data_cadastro: true
             },
-            select: { // Seleciona campos relevantes
-                id: true,
-                codigo_projeto: true,
-                nome_empresa: true, // <-- ADICIONE ESTA LINHA
-                status: true,
-                data_cadastro: true
-            },
-            orderBy: {
-                data_cadastro: 'desc'
-            },
+            orderBy: { data_cadastro: 'desc' },
             take: 5
         });
-
         res.status(200).json(projetosRecentes);
-
-    } catch (error) {
-        console.error("Erro ao buscar últimas atualizações:", error);
-        res.status(500).json({ message: "Erro ao buscar atualizações." });
-    }
+    } catch (error) { res.status(500).json({ message: "Erro ao buscar atualizações." }); }
 };
 
 exports.getPrazosProximos = async (req, res) => {
     const usuarioId = req.usuarioId;
     const hoje = new Date();
-    // Definir data limite (ex: próximos 30 dias)
     const dataLimite = new Date();
     dataLimite.setDate(hoje.getDate() + 30);
-
-    // Ajusta 'hoje' para o início do dia
     hoje.setHours(0, 0, 0, 0);
-
     try {
-        // Busca projetos não concluídos com data de entrega dentro do limite
         const projetosComPrazo = await prisma.projeto.findMany({
             where: {
                 criadoPorId: usuarioId,
-                status: {
-                    not: 'Concluído'
-                },
-                data_entrega: {
-                    gte: hoje,         // Maior ou igual a hoje (início do dia)
-                    lte: dataLimite    // Menor ou igual à data limite
-                    // *** Linha "not: null" REMOVIDA daqui ***
-                }
+                status: { not: 'Concluído' },
+                data_entrega: { gte: hoje, lte: dataLimite }
             },
-            select: { // Seleciona campos para a tabela
-                id: true,
-                codigo_projeto: true,
-                nome_empresa: true,
-                data_entrega: true
-            },
-            orderBy: {
-                data_entrega: 'asc' // Ordena pelos prazos mais próximos primeiro
-            },
-            take: 5 // Limita a 5 resultados
+            select: { id: true, codigo_projeto: true, nome_empresa: true, data_entrega: true },
+            orderBy: { data_entrega: 'asc' },
+            take: 5
         });
-
         res.status(200).json(projetosComPrazo);
-
-    } catch (error) {
-        console.error("Erro ao buscar prazos próximos:", error);
-        res.status(500).json({ message: "Erro ao buscar prazos de entrega." });
-    }
+    } catch (error) { res.status(500).json({ message: "Erro ao buscar prazos." }); }
 };
