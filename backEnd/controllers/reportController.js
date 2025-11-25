@@ -3,11 +3,11 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// Função auxiliar para cortar em 1 casa decimal (Floor)
+// Função auxiliar com arredondamento correto (toFixed)
+// Substituímos o Math.floor para garantir precisão matemática
 function calcularPorcentagemSegura(parte, total) {
   if (!total || total === 0) return 0;
-  const valor = (parte / total) * 100;
-  return Math.floor(valor * 10) / 10;
+  return Number(((parte / total) * 100).toFixed(1));
 }
 
 exports.generateReport = async (req, res) => {
@@ -90,11 +90,27 @@ exports.generateReport = async (req, res) => {
       const qtdEmMontagem = todosProjetos.filter(p => p.status === "Em Montagem").length;
       const qtdPendentes = todosProjetos.filter(p => p.status === "Pendente").length;
       
-      // Lógica da Porcentagem de Concluídos:
-      // Se estiver filtrando N/C: Base é o Total de Concluídos Geral (ex: 3 filtrados / 4 totais = 75%)
-      // Se estiver vendo Todos: Base é o Total de Projetos (ex: 4 concluídos / 10 projetos = 40%)
       const denominadorConcluidos = isFilteringNC ? countConcluidosGeral : totalProjetos;
+
+      // --- CORREÇÃO DE PORCENTAGEM (SOMA 100%) ---
+      // 1. Calcula as duas primeiras porcentagens normalmente
       const percConcluidos = calcularPorcentagemSegura(qtdConcluidosFiltrados, denominadorConcluidos);
+      const percEmMontagem = calcularPorcentagemSegura(qtdEmMontagem, totalProjetos);
+
+      // 2. Calcula Pendentes pelo "Resto" para fechar 100%
+      let percPendentes;
+      
+      if (!isFilteringNC && totalProjetos > 0) {
+          // Se estamos no relatório geral, o que sobrar é Pendente
+          const somaAtuais = percConcluidos + percEmMontagem;
+          percPendentes = Number((100 - somaAtuais).toFixed(1));
+          
+          // Segurança para não dar negativo em casos extremos
+          if (percPendentes < 0) percPendentes = 0;
+      } else {
+          // Se for filtro específico (N/C), calcula normalmente
+          percPendentes = calcularPorcentagemSegura(qtdPendentes, totalProjetos);
+      }
 
       // Prazos
       let somaDiasExecucao = 0;
@@ -120,9 +136,7 @@ exports.generateReport = async (req, res) => {
 
       // Montagem Estatísticas
       responseData.statistics = {
-        totalProjetos: totalProjetos, // Total filtrado atual
-        
-        // Informação nova para o frontend:
+        totalProjetos: totalProjetos, 
         totalConcluidosGeral: countConcluidosGeral, 
         isFilteringNC: isFilteringNC,
 
@@ -130,10 +144,10 @@ exports.generateReport = async (req, res) => {
         qtdEmMontagem: qtdEmMontagem,
         qtdPendentes: qtdPendentes,
         
-        // Porcentagens
+        // Porcentagens Corrigidas
         percConcluidos: percConcluidos,
-        percEmMontagem: calcularPorcentagemSegura(qtdEmMontagem, totalProjetos),
-        percPendentes: calcularPorcentagemSegura(qtdPendentes, totalProjetos),
+        percEmMontagem: percEmMontagem,
+        percPendentes: percPendentes,
         
         mediaDiasEntrega: mediaDias,
         qtdAtrasados: qtdAtrasados,
@@ -171,7 +185,6 @@ exports.generateReport = async (req, res) => {
 
     // --- RELATÓRIO DE MONTADOR ---
     else if (reportType === "montador") {
-      // (Código do montador mantido igual pois já funciona bem)
       const montadorWhere = {};
       if (montadorId) montadorWhere.id = parseInt(montadorId);
 
