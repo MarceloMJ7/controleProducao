@@ -28,42 +28,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const reportTypeSelect = document.getElementById("reportType");
     if (reportTypeSelect) {
-        reportTypeSelect.addEventListener("change", alternarFiltros);
-        alternarFiltros(); // Chama uma vez para iniciar correto
+      reportTypeSelect.addEventListener("change", alternarFiltros);
+      alternarFiltros(); // Chama uma vez para iniciar correto
     }
 
     // REMOVE qualquer listener antigo antes de adicionar o novo (para evitar duplicação)
     const newReportForm = reportForm.cloneNode(true);
     reportForm.parentNode.replaceChild(newReportForm, reportForm);
-    
+
     newReportForm.addEventListener("submit", handleGerarRelatorio);
 
     const exportBtn = document.getElementById("exportPdfButton");
     if (exportBtn) {
-        exportBtn.addEventListener("click", exportarPDF);
+      exportBtn.addEventListener("click", exportarPDF);
     }
 
     const tbody = document.getElementById("reportTableBody");
     if (tbody) {
-        tbody.addEventListener("click", function (e) {
-          const btn = e.target.closest(".btn-ver-nc");
-          if (btn) {
-            const descricao = btn.dataset.desc;
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                  title: "Detalhe da Não Conformidade",
-                  text: descricao,
-                  icon: "warning",
-                  background: "#212529",
-                  color: "#fff",
-                  confirmButtonColor: "#d33",
-                  confirmButtonText: "Fechar",
-                });
-            } else {
-                alert(`Não Conformidade: ${descricao}`);
-            }
+      tbody.addEventListener("click", function (e) {
+        const btn = e.target.closest(".btn-ver-nc");
+        if (btn) {
+          const descricao = btn.dataset.desc;
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              title: "Detalhe da Não Conformidade",
+              text: descricao,
+              icon: "warning",
+              background: "#212529",
+              color: "#fff",
+              confirmButtonColor: "#d33",
+              confirmButtonText: "Fechar",
+            });
+          } else {
+            alert(`Não Conformidade: ${descricao}`);
           }
-        });
+        }
+      });
     }
   }
 });
@@ -74,9 +74,9 @@ function alternarFiltros() {
   const statusFilter = document.getElementById("statusFilter");
   const ncFilter = document.getElementById("naoConformidadeFilter");
 
-  if(montadorFilter) montadorFilter.className = type === "montador" ? "col-md-3" : "col-md-3 d-none";
-  if(statusFilter) statusFilter.className = type === "projeto" ? "col-md-3" : "col-md-3 d-none";
-  if(ncFilter) ncFilter.className = type === "projeto" ? "col-md-3" : "col-md-3 d-none";
+  if (montadorFilter) montadorFilter.className = type === "montador" ? "col-md-3" : "col-md-3 d-none";
+  if (statusFilter) statusFilter.className = type === "projeto" ? "col-md-3" : "col-md-3 d-none";
+  if (ncFilter) ncFilter.className = type === "projeto" ? "col-md-3" : "col-md-3 d-none";
 }
 
 async function popularFiltroMontadores() {
@@ -86,14 +86,14 @@ async function popularFiltroMontadores() {
     const res = await fetch(`${API_BASE_URL}/api/montadores?limit=1000`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
     });
-    if(res.ok) {
-        const json = await res.json();
-        const montadores = json.data || (Array.isArray(json) ? json : []);
-        select.innerHTML = '<option value="">Todos os Montadores</option>';
-        montadores.forEach(m => select.innerHTML += `<option value="${m.id}">${m.nome}</option>`);
+    if (res.ok) {
+      const json = await res.json();
+      const montadores = json.data || (Array.isArray(json) ? json : []);
+      select.innerHTML = '<option value="">Todos os Montadores</option>';
+      montadores.forEach(m => select.innerHTML += `<option value="${m.id}">${m.nome}</option>`);
     }
-  } catch (e) { 
-      console.error("Erro ao carregar montadores", e); 
+  } catch (e) {
+    console.error("Erro ao carregar montadores", e);
   }
 }
 
@@ -109,10 +109,10 @@ function popularFiltroStatus() {
 
 async function handleGerarRelatorio(e) {
   e.preventDefault();
-  
+
   const filtroNCElement = document.getElementById("naoConformidadeSelect");
   const filtroNC = filtroNCElement ? filtroNCElement.value : "";
-  
+
   const filtros = {
     reportType: document.getElementById("reportType").value,
     montadorId: document.getElementById("montadorSelect").value,
@@ -132,7 +132,7 @@ async function handleGerarRelatorio(e) {
   visual.classList.add("d-none");
   resDiv.classList.remove("d-none");
   tbody.innerHTML = `<tr><td colspan="5" class="text-center text-white-50"><span class="spinner-border spinner-border-sm"></span> Gerando...</td></tr>`;
-  if(btnExport) btnExport.disabled = true;
+  if (btnExport) btnExport.disabled = true;
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/reports`, {
@@ -143,12 +143,12 @@ async function handleGerarRelatorio(e) {
       },
       body: JSON.stringify(filtros),
     });
-    
+
     if (!res.ok) {
-       // const errData = await res.json().catch(() => ({}));
-       // throw new Error(errData.message || "Erro ao gerar relatório.");
+      // const errData = await res.json().catch(() => ({}));
+      // throw new Error(errData.message || "Erro ao gerar relatório.");
     }
-    
+
     const data = await res.json();
 
     if (!data.tableData || data.tableData.length === 0) {
@@ -157,10 +157,10 @@ async function handleGerarRelatorio(e) {
     }
 
     visual.classList.remove("d-none");
-    
+
     // Passamos o filtroNC para controlar os títulos e cores
     renderKPIs(data.statistics, filtros.reportType, filtroNC);
-    
+
     document.getElementById("chartTitle").textContent = data.chartData.title;
     renderizarGrafico(data.chartData);
 
@@ -168,7 +168,7 @@ async function handleGerarRelatorio(e) {
       ? renderizarTabelaMontadores(data.tableData)
       : renderizarTabelaProjetos(data.tableData);
 
-    if(btnExport) btnExport.disabled = false;
+    if (btnExport) btnExport.disabled = false;
 
   } catch (err) {
     console.error(err);
@@ -179,12 +179,12 @@ async function handleGerarRelatorio(e) {
 
 function renderKPIs(stats, type, filterNC) {
   const row = document.getElementById("kpiCardsRow");
-  if(!row) return;
+  if (!row) return;
 
   const fmt = (val, perc) => `${val} <span class="fs-6 text-white-50 ms-1">(${perc}%)</span>`;
-  
+
   // Formatação para Filtro Ativo (Ex: "3 / 4 (75%)")
-  const fmtDual = (val, total, perc) => 
+  const fmtDual = (val, total, perc) =>
     `${val} <span class="fs-5 text-white-50">/ ${total}</span> <span class="fs-6 text-white-50 ms-1">(${perc}%)</span>`;
 
   const card = (t, valHTML, i, c) => `
@@ -205,34 +205,34 @@ function renderKPIs(stats, type, filterNC) {
     const isFiltering = stats.isFilteringNC === true;
 
     if (isFiltering) {
-        // === MODO FILTRADO (Separa o Total do Recorte) ===
-        
-        // 1. Card Total Geral de Concluídos (O Universo)
-        html += card(
-            "Total Concluídos",
-            `${stats.totalConcluidosGeral}`,
-            "fa-clipboard-check", 
-            "text-light"
-        );
+      // === MODO FILTRADO (Separa o Total do Recorte) ===
 
-        // 2. Card do Filtro Específico (A Fatia)
-        const titulo = filterNC === "true" ? "Com Não Conformidade" : "Sem Não Conformidade";
-        const cor = filterNC === "true" ? "text-danger" : "text-success";
-        const icone = filterNC === "true" ? "fa-exclamation-triangle" : "fa-check-circle";
+      // 1. Card Total Geral de Concluídos (O Universo)
+      html += card(
+        "Total Concluídos",
+        `${stats.totalConcluidosGeral}`,
+        "fa-clipboard-check",
+        "text-light"
+      );
 
-        html += card(
-            titulo,
-            fmt(stats.qtdConcluidos, stats.percConcluidos), 
-            icone,
-            cor
-        );
+      // 2. Card do Filtro Específico (A Fatia)
+      const titulo = filterNC === "true" ? "Com Não Conformidade" : "Sem Não Conformidade";
+      const cor = filterNC === "true" ? "text-danger" : "text-success";
+      const icone = filterNC === "true" ? "fa-exclamation-triangle" : "fa-check-circle";
+
+      html += card(
+        titulo,
+        fmt(stats.qtdConcluidos, stats.percConcluidos),
+        icone,
+        cor
+      );
 
     } else {
-        // === MODO VISÃO GERAL (Todos) ===
-        html += card("Concluídos", fmt(stats.qtdConcluidos, stats.percConcluidos), "fa-check-circle", "text-success");
-        html += card("Em Montagem", fmt(stats.qtdEmMontagem, stats.percEmMontagem), "fa-cogs", "text-primary");
-        html += card("Pendentes", fmt(stats.qtdPendentes, stats.percPendentes), "fa-hourglass-half", "text-warning");
-        html += card("Total de Projetos", `${stats.totalProjetos}`, "fa-list-alt", "text-light");
+      // === MODO VISÃO GERAL (Todos) ===
+      html += card("Concluídos", fmt(stats.qtdConcluidos, stats.percConcluidos), "fa-check-circle", "text-success");
+      html += card("Em Montagem", fmt(stats.qtdEmMontagem, stats.percEmMontagem), "fa-cogs", "text-primary");
+      html += card("Pendentes", fmt(stats.qtdPendentes, stats.percPendentes), "fa-hourglass-half", "text-warning");
+      html += card("Total de Projetos", `${stats.totalProjetos}`, "fa-list-alt", "text-light");
     }
 
     // 3 e 4. Métricas (Sempre aparecem)
@@ -255,7 +255,7 @@ function renderizarGrafico(chartData) {
   if (currentReportChart) currentReportChart.destroy();
   const ctxElement = document.getElementById("reportChart");
   if (!ctxElement) return;
-  
+
   const ctx = ctxElement.getContext("2d");
   const colors = { azul: "rgba(13, 110, 253, 0.7)", azulB: "rgba(13, 110, 253, 1)", vermelho: "rgba(220, 53, 69, 0.7)", vermelhoB: "rgba(220, 53, 69, 1)", verde: "rgba(25, 135, 84, 0.7)", amarelo: "rgba(255, 206, 86, 0.7)" };
 
@@ -264,8 +264,8 @@ function renderizarGrafico(chartData) {
     data: {
       labels: chartData.labels,
       datasets: chartData.type === "pie"
-          ? [{ data: chartData.data, backgroundColor: [colors.verde, colors.azul, colors.amarelo], borderWidth: 2, borderColor: "rgba(33,37,41,0.5)" }]
-          : chartData.datasets.map((d, i) => ({ ...d, backgroundColor: i === 0 ? colors.azul : colors.vermelho, borderColor: i === 0 ? colors.azulB : colors.vermelhoB, borderWidth: 1, borderRadius: 6 })),
+        ? [{ data: chartData.data, backgroundColor: [colors.verde, colors.azul, colors.amarelo], borderWidth: 2, borderColor: "rgba(33,37,41,0.5)" }]
+        : chartData.datasets.map((d, i) => ({ ...d, backgroundColor: i === 0 ? colors.azul : colors.vermelho, borderColor: i === 0 ? colors.azulB : colors.vermelhoB, borderWidth: 1, borderRadius: 6 })),
     },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: chartData.type === "pie" ? "top" : "bottom" } } },
   };
@@ -322,5 +322,5 @@ async function exportarPDF() {
     while (heightLeft > 0) { pos = heightLeft - imgH; pdf.addPage(); pdf.addImage(imgData, "PNG", 0, pos, w, imgH); heightLeft -= h; }
     pdf.save(`Relatorio_SGP_${new Date().toLocaleDateString("pt-BR").replace(/\//g, "-")}.pdf`);
     exibirSucesso("PDF Gerado!");
-  } catch (err) { console.error(err); exibirErro("Erro ao gerar PDF."); document.body.classList.remove("body-pdf-export"); } finally { btn.disabled = false; btn.innerHTML = oldText; }
+  } catch (err) { console.error(err); document.body.classList.remove("body-pdf-export"); } finally { btn.disabled = false; btn.innerHTML = oldText; }
 }
