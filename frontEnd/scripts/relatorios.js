@@ -10,6 +10,7 @@ import {
 
 let currentReportChart = null;
 
+// Configuração global do Chart.js
 if (typeof Chart !== "undefined") {
   Chart.defaults.color = "rgba(255, 255, 255, 0.7)";
   Chart.defaults.borderColor = "rgba(255, 255, 255, 0.1)";
@@ -26,35 +27,56 @@ document.addEventListener("DOMContentLoaded", function () {
     popularFiltroStatus();
 
     const reportTypeSelect = document.getElementById("reportType");
-    reportTypeSelect.addEventListener("change", alternarFiltros);
-    alternarFiltros();
+    if (reportTypeSelect) {
+        reportTypeSelect.addEventListener("change", alternarFiltros);
+        alternarFiltros(); // Chama uma vez para iniciar correto
+    }
 
-    reportForm.addEventListener("submit", handleGerarRelatorio);
-    document.getElementById("exportPdfButton").addEventListener("click", exportarPDF);
+    // REMOVE qualquer listener antigo antes de adicionar o novo (para evitar duplicação)
+    const newReportForm = reportForm.cloneNode(true);
+    reportForm.parentNode.replaceChild(newReportForm, reportForm);
+    
+    newReportForm.addEventListener("submit", handleGerarRelatorio);
+
+    const exportBtn = document.getElementById("exportPdfButton");
+    if (exportBtn) {
+        exportBtn.addEventListener("click", exportarPDF);
+    }
 
     const tbody = document.getElementById("reportTableBody");
-    tbody.addEventListener("click", function (e) {
-      const btn = e.target.closest(".btn-ver-nc");
-      if (btn) {
-        Swal.fire({
-          title: "Detalhe da Não Conformidade",
-          text: btn.dataset.desc,
-          icon: "warning",
-          background: "#212529",
-          color: "#fff",
-          confirmButtonColor: "#d33",
-          confirmButtonText: "Fechar",
+    if (tbody) {
+        tbody.addEventListener("click", function (e) {
+          const btn = e.target.closest(".btn-ver-nc");
+          if (btn) {
+            const descricao = btn.dataset.desc;
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                  title: "Detalhe da Não Conformidade",
+                  text: descricao,
+                  icon: "warning",
+                  background: "#212529",
+                  color: "#fff",
+                  confirmButtonColor: "#d33",
+                  confirmButtonText: "Fechar",
+                });
+            } else {
+                alert(`Não Conformidade: ${descricao}`);
+            }
+          }
         });
-      }
-    });
+    }
   }
 });
 
 function alternarFiltros() {
   const type = document.getElementById("reportType").value;
-  document.getElementById("montadorFilter").className = type === "montador" ? "col-md-3" : "col-md-3 d-none";
-  document.getElementById("statusFilter").className = type === "projeto" ? "col-md-3" : "col-md-3 d-none";
-  document.getElementById("naoConformidadeFilter").className = type === "projeto" ? "col-md-3" : "col-md-3 d-none";
+  const montadorFilter = document.getElementById("montadorFilter");
+  const statusFilter = document.getElementById("statusFilter");
+  const ncFilter = document.getElementById("naoConformidadeFilter");
+
+  if(montadorFilter) montadorFilter.className = type === "montador" ? "col-md-3" : "col-md-3 d-none";
+  if(statusFilter) statusFilter.className = type === "projeto" ? "col-md-3" : "col-md-3 d-none";
+  if(ncFilter) ncFilter.className = type === "projeto" ? "col-md-3" : "col-md-3 d-none";
 }
 
 async function popularFiltroMontadores() {
@@ -64,11 +86,15 @@ async function popularFiltroMontadores() {
     const res = await fetch(`${API_BASE_URL}/api/montadores?limit=1000`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
     });
-    const json = await res.json();
-    const montadores = json.data || (Array.isArray(json) ? json : []);
-    select.innerHTML = '<option value="">Todos os Montadores</option>';
-    montadores.forEach(m => select.innerHTML += `<option value="${m.id}">${m.nome}</option>`);
-  } catch (e) { console.error(e); }
+    if(res.ok) {
+        const json = await res.json();
+        const montadores = json.data || (Array.isArray(json) ? json : []);
+        select.innerHTML = '<option value="">Todos os Montadores</option>';
+        montadores.forEach(m => select.innerHTML += `<option value="${m.id}">${m.nome}</option>`);
+    }
+  } catch (e) { 
+      console.error("Erro ao carregar montadores", e); 
+  }
 }
 
 function popularFiltroStatus() {
@@ -84,7 +110,8 @@ function popularFiltroStatus() {
 async function handleGerarRelatorio(e) {
   e.preventDefault();
   
-  const filtroNC = document.getElementById("naoConformidadeSelect").value;
+  const filtroNCElement = document.getElementById("naoConformidadeSelect");
+  const filtroNC = filtroNCElement ? filtroNCElement.value : "";
   
   const filtros = {
     reportType: document.getElementById("reportType").value,
@@ -99,12 +126,13 @@ async function handleGerarRelatorio(e) {
   const ph = document.getElementById("reportPlaceholder");
   const resDiv = document.getElementById("reportResults");
   const tbody = document.getElementById("reportTableBody");
+  const btnExport = document.getElementById("exportPdfButton");
 
   ph.classList.add("d-none");
   visual.classList.add("d-none");
   resDiv.classList.remove("d-none");
   tbody.innerHTML = `<tr><td colspan="5" class="text-center text-white-50"><span class="spinner-border spinner-border-sm"></span> Gerando...</td></tr>`;
-  document.getElementById("exportPdfButton").disabled = true;
+  if(btnExport) btnExport.disabled = true;
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/reports`, {
@@ -115,11 +143,16 @@ async function handleGerarRelatorio(e) {
       },
       body: JSON.stringify(filtros),
     });
-    if (!res.ok) throw new Error("Erro ao gerar relatório.");
+    
+    if (!res.ok) {
+       // const errData = await res.json().catch(() => ({}));
+       // throw new Error(errData.message || "Erro ao gerar relatório.");
+    }
+    
     const data = await res.json();
 
-    if (data.tableData.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" class="text-center text-white-50">Nenhum dado encontrado.</td></tr>`;
+    if (!data.tableData || data.tableData.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center text-white-50">Nenhum dado encontrado com os filtros selecionados.</td></tr>`;
       return;
     }
 
@@ -135,18 +168,25 @@ async function handleGerarRelatorio(e) {
       ? renderizarTabelaMontadores(data.tableData)
       : renderizarTabelaProjetos(data.tableData);
 
-    document.getElementById("exportPdfButton").disabled = false;
+    if(btnExport) btnExport.disabled = false;
+
   } catch (err) {
+    console.error(err);
     visual.classList.add("d-none");
     tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">${err.message}</td></tr>`;
   }
 }
 
-// --- FUNÇÃO DE KPIs REFORMULADA ---
 function renderKPIs(stats, type, filterNC) {
   const row = document.getElementById("kpiCardsRow");
-  
+  if(!row) return;
+
   const fmt = (val, perc) => `${val} <span class="fs-6 text-white-50 ms-1">(${perc}%)</span>`;
+  
+  // Formatação para Filtro Ativo (Ex: "3 / 4 (75%)")
+  const fmtDual = (val, total, perc) => 
+    `${val} <span class="fs-5 text-white-50">/ ${total}</span> <span class="fs-6 text-white-50 ms-1">(${perc}%)</span>`;
+
   const card = (t, valHTML, i, c) => `
         <div class="col-xxl-3 col-lg-6 col-md-6">
             <div class="card glass-card h-100">
@@ -160,20 +200,22 @@ function renderKPIs(stats, type, filterNC) {
   if (type === "projeto") {
     let html = "";
 
-    if (stats.isFilteringNC) {
+    // Verifica se stats.isFilteringNC existe (veio do backend atualizado)
+    // Se não vier, assume comportamento padrão (todos)
+    const isFiltering = stats.isFilteringNC === true;
+
+    if (isFiltering) {
         // === MODO FILTRADO (Separa o Total do Recorte) ===
         
         // 1. Card Total Geral de Concluídos (O Universo)
-        // Mostra apenas o número absoluto, para dar contexto
         html += card(
             "Total Concluídos",
             `${stats.totalConcluidosGeral}`,
-            "fa-clipboard-check", // Ícone diferente para diferenciar
-            "text-light" // Cor neutra
+            "fa-clipboard-check", 
+            "text-light"
         );
 
         // 2. Card do Filtro Específico (A Fatia)
-        // Mostra a quantidade filtrada e a porcentagem em relação ao total acima
         const titulo = filterNC === "true" ? "Com Não Conformidade" : "Sem Não Conformidade";
         const cor = filterNC === "true" ? "text-danger" : "text-success";
         const icone = filterNC === "true" ? "fa-exclamation-triangle" : "fa-check-circle";
@@ -187,22 +229,20 @@ function renderKPIs(stats, type, filterNC) {
 
     } else {
         // === MODO VISÃO GERAL (Todos) ===
-        // Mostra o fluxo completo de trabalho
         html += card("Concluídos", fmt(stats.qtdConcluidos, stats.percConcluidos), "fa-check-circle", "text-success");
         html += card("Em Montagem", fmt(stats.qtdEmMontagem, stats.percEmMontagem), "fa-cogs", "text-primary");
         html += card("Pendentes", fmt(stats.qtdPendentes, stats.percPendentes), "fa-hourglass-half", "text-warning");
-        // Substitui N/C por Total Geral para fechar a conta visualmente
         html += card("Total de Projetos", `${stats.totalProjetos}`, "fa-list-alt", "text-light");
     }
 
-    // 3 e 4. Métricas (Sempre aparecem no final)
+    // 3 e 4. Métricas (Sempre aparecem)
     html += card("Tempo Médio", `${stats.mediaDiasEntrega} <span class="fs-6 text-white-50">dias</span>`, "fa-clock", "text-info");
     html += card("Pontualidade", `${stats.percNoPrazo}% <span class="fs-6 text-white-50">no prazo</span>`, "fa-calendar-check", "text-success");
 
     row.innerHTML = html;
 
   } else {
-    // Layout Montadores (Sem alterações)
+    // Layout Montadores
     row.innerHTML =
       card("Montadores", stats.totalMontadores, "fa-users", "text-primary") +
       card("Total Concluídos", stats.totalProjetosConcluidos, "fa-check-circle", "text-success") +
@@ -213,7 +253,10 @@ function renderKPIs(stats, type, filterNC) {
 
 function renderizarGrafico(chartData) {
   if (currentReportChart) currentReportChart.destroy();
-  const ctx = document.getElementById("reportChart").getContext("2d");
+  const ctxElement = document.getElementById("reportChart");
+  if (!ctxElement) return;
+  
+  const ctx = ctxElement.getContext("2d");
   const colors = { azul: "rgba(13, 110, 253, 0.7)", azulB: "rgba(13, 110, 253, 1)", vermelho: "rgba(220, 53, 69, 0.7)", vermelhoB: "rgba(220, 53, 69, 1)", verde: "rgba(25, 135, 84, 0.7)", amarelo: "rgba(255, 206, 86, 0.7)" };
 
   let config = {
