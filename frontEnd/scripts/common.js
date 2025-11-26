@@ -11,7 +11,6 @@ export const API_BASE_URL =
 
 // --- Lógica de Autenticação ---
 export async function verificarAutenticacaoECarregarUsuario() {
-  // "cadastro.html" REMOVIDO DAQUI (Agora é página interna)
   const paginasPublicas = [
     "login.html",
     "esqueci-senha.html",
@@ -20,11 +19,13 @@ export async function verificarAutenticacaoECarregarUsuario() {
   const paginaAtual = window.location.pathname.split("/").pop();
   const token = localStorage.getItem("authToken");
 
+  // 1. Se for página pública, redireciona para dashboard se já tiver token
   if (paginasPublicas.includes(paginaAtual) || paginaAtual === "") {
     if (token) window.location.href = "dashboard.html";
     return;
   }
 
+  // 2. Se não tiver token e for página privada, manda pro login
   if (!token) {
     window.location.href = "login.html";
     return;
@@ -36,19 +37,31 @@ export async function verificarAutenticacaoECarregarUsuario() {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-cache",
     });
+
     if (response.ok) {
+      // SUCESSO: Carrega dados do usuário
       const usuario = await response.json();
       const elementoNome = document.getElementById("nomeUsuarioLogado");
       if (elementoNome) elementoNome.textContent = usuario.nome;
 
       setupSidebarToggle();
     } else {
-      localStorage.removeItem("authToken");
-      window.location.href = "login.html";
+      // ERRO NA RESPOSTA
+      // Só desloga se for 401 (Token inválido/expirado) ou 403 (Proibido)
+      if (response.status === 401 || response.status === 403) {
+        console.warn("Sessão expirada. Redirecionando...");
+        localStorage.removeItem("authToken");
+        window.location.href = "login.html";
+      } else {
+        // Se for erro 500 ou outro, não desloga, apenas avisa
+        console.error("Erro no servidor (não é auth):", response.status);
+      }
     }
   } catch (error) {
-    localStorage.removeItem("authToken");
-    window.location.href = "login.html";
+    // ERRO DE REDE (Servidor fora do ar ou acordando)
+    console.error("Erro de conexão:", error);
+    // NÃO DESLOGA AQUI. Isso evita o "kick" quando o Render está acordando.
+    // Opcional: Você pode exibir um Toast avisando "Tentando reconectar..."
   }
 }
 
